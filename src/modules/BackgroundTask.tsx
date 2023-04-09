@@ -15,12 +15,12 @@ type Options = {
 const defaultOptions: Options = {
   taskName: 'background-task',
   taskTitle: displayName,
-  taskDesc: 'Sempre alerta!',
+  taskDesc: '',
   taskIcon: {
     type: 'mipmap',
     name: 'ic_launcher_round',
   },
-  linkingURI: 'twitchwhois://history',
+  linkingURI: 'twitchwhois://monitor',
 };
 
 export class BackgroundTask {

@@ -39,10 +39,10 @@ export default function SettingsPage() {
             style={{
               flex: 1,
             }}
-            step={1}
+            step={5}
             value={settings.interval}
-            minimumValue={1}
-            maximumValue={30}
+            minimumValue={5}
+            maximumValue={60}
             onValueChange={async value => {
               dispatch(actions.setInterval(value));
             }}

@@ -2,7 +2,9 @@
 import React from 'react';
 import {Button, Divider, List, Text, useTheme} from 'react-native-paper';
 import {View, ScrollView, StyleSheet} from 'react-native';
+import Fonts from './Styles/Fonts';
 import Icon from '@/components/Icon';
+import {Linking} from 'react-native';
 
 export default function FAQPage(): JSX.Element {
   const {fonts} = useTheme();
@@ -13,10 +15,10 @@ export default function FAQPage(): JSX.Element {
         <List.Accordion
           title="Motivação"
           id="motivacao"
-          titleStyle={fonts.headlineSmall}>
+          titleStyle={[fonts.headlineSmall, Fonts.RobotoBlack]}>
           <Divider />
           <View style={style.content}>
-            <Text>
+            <Text style={Fonts.RobotoRegular}>
               A motivação por trás do desenvolvimento do Twitch Who Is é
               simples: resolver um problema que o criador, Ronis Xogum,
               enfrentou pessoalmente ao tentar monitorar um nome de usuário
@@ -40,10 +42,10 @@ export default function FAQPage(): JSX.Element {
         <List.Accordion
           title="O que é?"
           id="o-que-e"
-          titleStyle={fonts.headlineSmall}>
+          titleStyle={[fonts.headlineSmall, Fonts.RobotoBlack]}>
           <Divider />
           <View style={style.content}>
-            <Text>
+            <Text style={Fonts.RobotoRegular}>
               Twitch Who Is é um aplicativo projetado para ajudar os usuários a
               verificar a disponibilidade de nomes de usuário na plataforma
               Twitch. Ele permite que os usuários insiram um nome de usuário
@@ -64,10 +66,10 @@ export default function FAQPage(): JSX.Element {
         <List.Accordion
           title="Como usar?"
           id="como-usar"
-          titleStyle={fonts.headlineSmall}>
+          titleStyle={[fonts.headlineSmall, Fonts.RobotoBlack]}>
           <Divider />
           <View style={style.content}>
-            <Text>
+            <Text style={Fonts.RobotoRegular}>
               O aplicativo Twitch Who Is foi projetado para ajudar os usuários a
               verificar a disponibilidade de nomes de usuário na plataforma
               Twitch. Ao abrir o aplicativo, o usuário é levado diretamente para
@@ -101,31 +103,41 @@ export default function FAQPage(): JSX.Element {
       </List.AccordionGroup>
       <View style={{marginTop: 40}}>
         <Text
-          style={{
-            textAlign: 'center',
-            marginBottom: 10,
-            fontStyle: 'italic',
-            fontSize: 18,
-          }}>
+          style={[
+            {
+              textAlign: 'center',
+              marginTop: 10,
+              fontSize: 18,
+            },
+            Fonts.Neodigital,
+          ]}>
           Siga o Xogum nas redes:
         </Text>
         <View
           style={{
-            marginVertical: 20,
+            marginVertical: 10,
             flexDirection: 'row',
             justifyContent: 'center',
             gap: 20,
           }}>
-          <Button mode="contained">
+          <Button
+            mode="contained"
+            onPress={() => Linking.openURL('https://twitter.com/xogumon')}>
             <Icon from="fontAwesome5" name="twitter" />
           </Button>
-          <Button mode="contained">
+          <Button
+            mode="contained"
+            onPress={() => Linking.openURL('https://www.twitch.tv/xogum')}>
             <Icon from="fontAwesome5" name="twitch" />
           </Button>
-          <Button mode="contained">
+          <Button
+            mode="contained"
+            onPress={() => Linking.openURL('https://www.youtube.com/@xogum')}>
             <Icon from="fontAwesome5" name="youtube" />
           </Button>
-          <Button mode="contained">
+          <Button
+            mode="contained"
+            onPress={() => Linking.openURL('https://tiktok.com/@xogumon')}>
             <Icon from="fontAwesome5" name="tiktok" />
           </Button>
         </View>

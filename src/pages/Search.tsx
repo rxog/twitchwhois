@@ -4,6 +4,7 @@ import {ScrollView, View} from 'react-native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import SearchBox from '@/components/SearchBox';
 import {Text, useTheme} from 'react-native-paper';
+import Fonts from './Styles/Fonts';
 
 export default function SearchPage({
   navigation,
@@ -24,12 +25,18 @@ export default function SearchPage({
           style={[
             fonts.headlineLarge,
             {
-              fontStyle: 'italic',
+              fontFamily: Fonts.TwitchyTV.fontFamily,
               color: colors.onSurfaceVariant,
             },
           ]}>
           Twitch
-          <Text style={{color: colors.onSurface, fontWeight: 'bold'}}>Who</Text>
+          <Text
+            style={{
+              color: colors.onSecondaryContainer,
+              fontFamily: Fonts.TalkComic.fontFamily,
+            }}>
+            Who
+          </Text>
           Is
         </Text>
       </View>

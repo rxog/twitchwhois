@@ -4,8 +4,8 @@ import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import StackNavigator from './StackNavigator';
 import SettingsPage from '@/pages/Settings';
-import HistoryPage from '@/pages/History';
-import FAQPage from '@/pages/FAQ';
+import MonitorPage from '@/pages/Monitor';
+import AboutPage from '@/pages/About';
 import {Text} from 'react-native-paper';
 import Icon from '@/components/Icon';
 import TabButton from '@/components/TabButton';
@@ -40,6 +40,16 @@ export default function TabNavigator() {
         }}
       />
       <Tab.Screen
+        name="monitor"
+        component={MonitorPage}
+        options={{
+          title: 'Monitoramento',
+          tabBarIcon: props => (
+            <Icon from="materialCommunity" name="list-status" {...props} />
+          ),
+        }}
+      />
+      <Tab.Screen
         name="settings"
         component={SettingsPage}
         options={{
@@ -50,22 +60,16 @@ export default function TabNavigator() {
         }}
       />
       <Tab.Screen
-        name="history"
-        component={HistoryPage}
-        options={{
-          title: 'Monitoramento',
-          tabBarIcon: props => (
-            <Icon from="foundation" name="results" {...props} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="faq"
-        component={FAQPage}
+        name="about"
+        component={AboutPage}
         options={{
           title: 'Sobre',
           tabBarIcon: props => (
-            <Icon from="materialCommunity" name="card-bulleted" {...props} />
+            <Icon
+              from="materialCommunity"
+              name="exclamation-thick"
+              {...props}
+            />
           ),
         }}
       />

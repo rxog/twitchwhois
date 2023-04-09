@@ -8,11 +8,6 @@ export default class Username {
   };
 
   static parse = (text: string): string => {
-    return slugify(text, {
-      lower: true,
-      trim: true,
-      replacement: '_',
-      remove: /\s-/,
-    });
+    return slugify(text);
   };
 }

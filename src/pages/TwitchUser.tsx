@@ -39,6 +39,9 @@ import {
 import addMinutes from 'date-fns/addMinutes';
 import ResultBox from '@/components/ResultBox';
 import LinearGradient from 'react-native-linear-gradient';
+import Fonts from './Styles/Fonts';
+import {capitalize} from 'lodash';
+import Uptime from '@/utils/Uptime';
 
 export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
   const dispatch = useDispatch();
@@ -272,12 +275,11 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
           {userdata?.description}
         </Text>
       </ImageBackground>
-      <Card style={{borderRadius: 0}}>
+      <Card style={{borderRadius: 0, paddingHorizontal: 10}}>
         <Card.Actions
           style={{
             flexDirection: 'row',
             gap: 5,
-            marginBottom: 10,
           }}>
           <Button
             onPress={() =>
@@ -296,11 +298,15 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
         </Card.Actions>
       </Card>
       <List.Section>
-        <List.Subheader>Informações da conta</List.Subheader>
+        <List.Subheader style={Fonts.RobotoRegular}>
+          Informações da conta
+        </List.Subheader>
         {userdata && userdata.hasOwnProperty('broadcaster_type') && (
           <>
             <Divider />
             <List.Item
+              titleStyle={Fonts.RobotoRegular}
+              descriptionStyle={Fonts.RobotoLight}
               title="Tipo"
               description={
                 userdata.broadcaster_type === 'partner'
@@ -315,13 +321,20 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
         {userdata && userdata.hasOwnProperty('id') && (
           <>
             <Divider />
-            <List.Item title="ID" description={userdata.id} />
+            <List.Item
+              titleStyle={Fonts.RobotoRegular}
+              descriptionStyle={Fonts.RobotoLight}
+              title="ID"
+              description={userdata.id}
+            />
           </>
         )}
         {userdata && userdata.hasOwnProperty('follows') && (
           <>
             <Divider />
             <List.Item
+              titleStyle={Fonts.RobotoRegular}
+              descriptionStyle={Fonts.RobotoLight}
               title="Seguidores"
               description={Number(userdata.follows).toLocaleString('pt-BR')}
             />
@@ -331,23 +344,28 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
           <>
             <Divider />
             <List.Item
+              titleStyle={Fonts.RobotoRegular}
+              descriptionStyle={Fonts.RobotoLight}
               title="Idade"
-              description={formatDistanceToNow(
-                Date.parse(userdata.created_at),
-                {
+              description={capitalize(
+                formatDistanceToNow(Date.parse(userdata.created_at), {
                   locale: ptBR,
-                },
+                }),
               )}
             />
             <Divider />
             <List.Item
+              titleStyle={Fonts.RobotoRegular}
+              descriptionStyle={Fonts.RobotoLight}
               title="Criada em"
-              description={format(
-                Date.parse(userdata.created_at),
-                'EEE, dd/MM/yyyy HH:mm:ss',
-                {
-                  locale: ptBR,
-                },
+              description={capitalize(
+                format(
+                  Date.parse(userdata.created_at),
+                  'EEE, dd/MM/yyyy HH:mm:ss',
+                  {
+                    locale: ptBR,
+                  },
+                ),
               )}
             />
           </>
@@ -356,6 +374,8 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
           <>
             <Divider />
             <List.Item
+              titleStyle={Fonts.RobotoRegular}
+              descriptionStyle={Fonts.RobotoLight}
               title="Língua"
               description={ISO6391.getNativeName(userdata.broadcaster_language)}
             />
@@ -364,27 +384,33 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
         {userdata && userdata.hasOwnProperty('title') && (
           <>
             <Divider />
-            <List.Item title="Título" description={userdata.title} />
+            <List.Item
+              titleStyle={Fonts.RobotoRegular}
+              descriptionStyle={Fonts.RobotoLight}
+              title="Título"
+              description={userdata.title}
+            />
           </>
         )}
         {userdata && userdata.hasOwnProperty('game_name') && (
           <>
             <Divider />
-            <List.Item title="Categoria" description={userdata.game_name} />
+            <List.Item
+              titleStyle={Fonts.RobotoRegular}
+              descriptionStyle={Fonts.RobotoLight}
+              title="Categoria"
+              description={userdata.game_name}
+            />
           </>
         )}
         {userdata && userdata.hasOwnProperty('started_at') && (
           <>
             <Divider />
             <List.Item
-              title={userdata.type === 'live' ? 'Ao vivo' : 'Reprisando'}
-              description={formatDistanceToNow(
-                Date.parse(userdata.started_at),
-                {
-                  locale: ptBR,
-                  addSuffix: true,
-                },
-              )}
+              titleStyle={Fonts.RobotoRegular}
+              descriptionStyle={Fonts.RobotoLight}
+              title={userdata.type === 'live' ? 'Ao vivo há' : 'Reprisando há'}
+              description={Uptime(new Date(userdata.started_at))}
             />
           </>
         )}
@@ -392,6 +418,8 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
           <>
             <Divider />
             <List.Item
+              titleStyle={Fonts.RobotoRegular}
+              descriptionStyle={Fonts.RobotoLight}
               title="Espectadores"
               description={Number(userdata.viewer_count).toLocaleString(
                 'pt-br',
@@ -403,6 +431,8 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
           <>
             <Divider />
             <List.Item
+              titleStyle={Fonts.RobotoRegular}
+              descriptionStyle={Fonts.RobotoLight}
               title="Público"
               description={userdata.is_mature ? 'Adulto' : 'Livre'}
             />
@@ -412,6 +442,7 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
           <>
             <Divider />
             <List.Item
+              titleStyle={Fonts.RobotoRegular}
               descriptionStyle={{
                 flex: 1,
                 flexDirection: 'row',

@@ -12,43 +12,38 @@ export default function RunBackgroundTask() {
       const dispatch = store.dispatch;
       const {results, settings} = store.getState();
 
-      results
-        .filter(result => result.running)
-        .map(async data => {
-          const {username, nextCheck} = data;
-          if (username) {
-            const now = new Date();
-            const next = nextCheck ? Date.parse(nextCheck) : now;
-            const timeouted = isBefore(next, now);
+      for (const {username, nextCheck} of results.filter(
+        result => result.running,
+      )) {
+        const now = new Date();
+        const next = nextCheck ? Date.parse(nextCheck) : now;
+        const timeouted = isBefore(next, now);
 
-            if (timeouted) {
-              TwitchAPI.isAvailable(username, signal).then(async status => {
-                if (status) {
-                  dispatch(
-                    actions.saveResult({
-                      username,
-                      running: false,
-                      status,
-                    }),
-                  );
-                } else {
-                  dispatch(
-                    actions.saveResult({
-                      username,
-                      lastCheck: now.toISOString(),
-                      nextCheck: addMinutes(
-                        now,
-                        settings.interval,
-                      ).toISOString(),
-                      status,
-                    }),
-                  );
-                }
-              });
+        if (timeouted) {
+          console.log('Timeouted!');
+          await TwitchAPI.isAvailable(username, signal).then(async status => {
+            if (status) {
+              dispatch(
+                actions.saveResult({
+                  username,
+                  running: false,
+                  status,
+                }),
+              );
+            } else {
+              dispatch(
+                actions.saveResult({
+                  username,
+                  lastCheck: now.toISOString(),
+                  nextCheck: addMinutes(now, settings.interval).toISOString(),
+                  status,
+                }),
+              );
             }
-          }
-          await Sleep(1000);
-        });
+          });
+        }
+        await Sleep(1000);
+      }
     } catch (err) {
       console.log(err);
     }

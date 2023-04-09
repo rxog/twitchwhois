@@ -7,12 +7,15 @@ import {RootState} from '@/store';
 import {actions} from '@/store/reducers/results';
 import Draggable from '@/components/Draggable';
 import {useSelector, useDispatch} from 'react-redux';
-import {Text, TouchableRipple, useTheme} from 'react-native-paper';
+import {Divider, Text, TouchableRipple, useTheme} from 'react-native-paper';
+import {useNavigation, useFocusEffect} from '@react-navigation/native';
+import isBefore from 'date-fns/isBefore';
 import capitalize from 'lodash/capitalize';
 import Icon from '@/components/Icon';
 
-export default function HistoryPage() {
+export default function MonitorPage() {
   const {colors, fonts} = useTheme();
+  const navigation = useNavigation();
 
   const dispatch = useDispatch();
   const reduxData = useSelector((state: RootState) => state);
@@ -20,6 +23,14 @@ export default function HistoryPage() {
   const {results} = useMemo(() => {
     return reduxData;
   }, [reduxData]);
+
+  const running = results.filter(result => result.running).length;
+
+  useFocusEffect(() => {
+    navigation.setOptions({
+      tabBarBadge: running > 0 ? running : null,
+    });
+  });
 
   if (results && results.length) {
     return (
@@ -93,40 +104,6 @@ export default function HistoryPage() {
                   onLeft={async () => {
                     dispatch(actions.removeResult(item.username));
                   }}>
-                  <TouchableRipple
-                    style={{
-                      paddingVertical: 15,
-                      paddingHorizontal: 20,
-                      backgroundColor: item.status ? '#66bb6a' : '#f44336',
-                      borderRightColor: colors.surfaceVariant,
-                      borderRightWidth: 1,
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                    }}
-                    onLongPress={async () => {
-                      if (item.running) {
-                        ToastAndroid.show(
-                          `Última atualização: ${format(
-                            Date.parse(item.lastCheck as string),
-                            'EEEE, dd/MM/yyyy HH:mm',
-                            {
-                              locale: ptBR,
-                            },
-                          )}`,
-                          ToastAndroid.SHORT,
-                        );
-                        return;
-                      }
-                      dispatch(actions.saveResult({...item, running: true}));
-                    }}
-                    onPress={e => e}
-                    rippleColor="rgba(0, 0, 0, .32)">
-                    <Icon
-                      from="materialIcons"
-                      name={item.status ? 'mood' : 'mood-bad'}
-                      size={40}
-                    />
-                  </TouchableRipple>
                   <View
                     style={{
                       flex: 1,
@@ -144,6 +121,7 @@ export default function HistoryPage() {
                       ]}>
                       {item.username}
                     </Text>
+                    <Divider />
                     <Text
                       style={[
                         fonts.bodyMedium,
@@ -155,7 +133,7 @@ export default function HistoryPage() {
                       {capitalize(
                         format(
                           Date.parse(item.lastCheck as string),
-                          'EEEE, dd/MM/yyyy HH:mm',
+                          'EEEE, dd/MM/yyyy HH:mm:ss',
                           {
                             locale: ptBR,
                           },
@@ -171,18 +149,49 @@ export default function HistoryPage() {
                       ]}>
                       Próxima checagem:{'\n'}
                       {item.running
-                        ? capitalize(
-                            format(
-                              Date.parse(item.nextCheck as string),
-                              'EEEE, dd/MM/yyyy HH:mm',
-                              {
-                                locale: ptBR,
-                              },
-                            ),
+                        ? isBefore(
+                            Date.parse(item.nextCheck as string),
+                            Date.now(),
                           )
+                          ? 'Em instantes'
+                          : capitalize(
+                              format(
+                                Date.parse(item.nextCheck as string),
+                                'EEEE, dd/MM/yyyy HH:mm:ss',
+                                {
+                                  locale: ptBR,
+                                },
+                              ),
+                            )
                         : 'Parado'}
                     </Text>
                   </View>
+                  <TouchableRipple
+                    style={{
+                      paddingHorizontal: 10,
+                      backgroundColor: item.status ? '#66bb6a' : '#f44336',
+                      borderLeftColor: colors.surfaceVariant,
+                      borderLeftWidth: 1,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}
+                    onLongPress={async () => {
+                      if (item.running) {
+                        dispatch(actions.saveResult({...item, running: false}));
+                        ToastAndroid.show('Parando...', ToastAndroid.SHORT);
+                        return;
+                      }
+                      ToastAndroid.show('Iniciando...', ToastAndroid.SHORT);
+                      dispatch(actions.saveResult({...item, running: true}));
+                    }}
+                    onPress={e => e}
+                    rippleColor="rgba(0, 0, 0, .32)">
+                    <Icon
+                      from="materialIcons"
+                      name={item.status ? 'mood' : 'mood-bad'}
+                      size={34}
+                    />
+                  </TouchableRipple>
                 </Draggable>
               </View>
             );
