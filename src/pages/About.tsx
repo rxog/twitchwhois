@@ -70,13 +70,11 @@ export default function FAQPage(): JSX.Element {
           <Divider />
           <View style={style.content}>
             <Text style={Fonts.RobotoRegular}>
-              O aplicativo Twitch Who Is foi projetado para ajudar os usuários a
-              verificar a disponibilidade de nomes de usuário na plataforma
-              Twitch. Ao abrir o aplicativo, o usuário é levado diretamente para
-              a tela de busca, onde pode inserir um nome de usuário desejado. Se
-              o nome estiver em uso, os dados do streamer correspondente são
-              exibidos na tela. Caso contrário, é verificada a disponibilidade
-              do nome de usuário naquele momento, podendo ser{' '}
+              Ao abrir o aplicativo, o usuário é levado diretamente para a tela
+              de busca, onde pode inserir um nome de usuário desejado. Se o nome
+              estiver em uso, os dados do usuário correspondente são exibidos na
+              tela. Caso contrário, é verificada a disponibilidade do nome de
+              usuário naquele momento, podendo ser{' '}
               <Text style={{fontWeight: 'bold'}}>DISPONÍVEL</Text> ou{' '}
               <Text style={{fontWeight: 'bold'}}>INDISPONÍVEL</Text>.{'\n\n'}
               Se o nome de usuário estiver disponível, o usuário pode clicar na

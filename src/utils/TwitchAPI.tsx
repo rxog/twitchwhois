@@ -1,6 +1,7 @@
 import axios, {AxiosInstance} from 'axios';
 import {merge} from 'lodash';
 import {CLIENT_ID, CLIENT_SECRET} from '@env';
+import {getUserAgentSync} from 'react-native-device-info';
 
 type TokenResponse = {
   access_token: string;
@@ -197,6 +198,9 @@ class TwitchAPI {
         `https://passport.twitch.tv/usernames/${username}`,
         {
           validateStatus: () => true,
+          headers: {
+            'User-Agent': getUserAgentSync(),
+          },
           signal,
         },
       );

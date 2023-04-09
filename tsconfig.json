@@ -17,6 +17,6 @@
       "@/utils/*": ["src/utils/*"],
       "@/assets": ["src/assets/"],
       "@/assets/*": ["src/assets/*"]
-    },
+    }
   }
 }

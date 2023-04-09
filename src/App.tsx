@@ -40,7 +40,7 @@ function App(): JSX.Element {
           prefixes: ['twitchwhois://'],
           config: {
             screens: {
-              history: 'history',
+              monitor: 'monitor',
             },
           },
         }}
