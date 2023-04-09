@@ -144,7 +144,7 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
                 }),
               );
               navigation.goBack();
-              navigation.navigate('history');
+              navigation.navigate('monitor');
             }}
           />
         );
