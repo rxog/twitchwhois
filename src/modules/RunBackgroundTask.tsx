@@ -3,10 +3,25 @@ import isBefore from 'date-fns/isBefore';
 import addMinutes from 'date-fns/addMinutes';
 import {store} from '@/store';
 import {actions} from '@/store/reducers/results';
+import displayNotification from '@/modules/DisplayNotification';
 import TwitchAPI from '@/utils/TwitchAPI';
 import Sleep from '@/utils/Sleep';
 
 export default function RunBackgroundTask() {
+  const runningTasks = store
+    .getState()
+    .results.filter(task => task.running).length;
+
+  if (runningTasks && BackgroundTask.isRunning) {
+    return;
+  }
+  if (!runningTasks && BackgroundTask.isRunning) {
+    return BackgroundTask.stop();
+  }
+  if (!runningTasks && !BackgroundTask.isRunning) {
+    return;
+  }
+
   BackgroundTask.run(async ({signal}: {signal: AbortSignal}) => {
     try {
       const dispatch = store.dispatch;
@@ -23,6 +38,7 @@ export default function RunBackgroundTask() {
           console.log('Timeouted!');
           await TwitchAPI.isAvailable(username, signal).then(async status => {
             if (status) {
+              displayNotification(username);
               dispatch(
                 actions.saveResult({
                   username,

@@ -1,11 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import 'react-native-gesture-handler';
 import React, {useEffect, useState} from 'react';
-import {
-  AppRegistry,
-  DeviceEventEmitter,
-  PermissionsAndroid,
-} from 'react-native';
+import {AppRegistry, PermissionsAndroid} from 'react-native';
 import RunBackgroundTask from '@/modules/RunBackgroundTask';
 import BackgroundTask from '@/modules/BackgroundTask';
 import {name as appName} from './app.json';
@@ -34,11 +29,8 @@ export default function Main() {
       }
     };
     checkStatus();
-    const bootListener = DeviceEventEmitter.addListener('BOOT_COMPLETED', () =>
-      checkStatus(),
-    );
-
-    return () => bootListener.remove();
+    const timeoutId = setTimeout(() => checkStatus(), 10000);
+    return () => clearTimeout(timeoutId);
   }, []);
 
   return (

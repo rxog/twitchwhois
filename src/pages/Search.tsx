@@ -2,7 +2,7 @@
 import React from 'react';
 import {ScrollView, View} from 'react-native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import SearchBox from '@/components/SearchBox';
+import Searchbar from '@/components/Searchbar';
 import {Text, useTheme} from 'react-native-paper';
 import Fonts from './Styles/Fonts';
 
@@ -30,17 +30,32 @@ export default function SearchPage({
             },
           ]}>
           Twitch
-          <Text
+          <View
             style={{
-              color: colors.onSecondaryContainer,
-              fontFamily: Fonts.TalkComic.fontFamily,
+              transform: [
+                {
+                  rotate: '-10deg',
+                },
+                {
+                  translateY: 6,
+                },
+              ],
             }}>
-            Who
-          </Text>
+            <Text
+              style={[
+                fonts.headlineLarge,
+                {
+                  color: colors.onSecondaryContainer,
+                  fontFamily: Fonts.TalkComic.fontFamily,
+                },
+              ]}>
+              Who
+            </Text>
+          </View>
           Is
         </Text>
       </View>
-      <SearchBox
+      <Searchbar
         onSubmit={query => {
           navigation.navigate('twitchuser', {
             username: query,

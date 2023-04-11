@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import {Button, Divider, List, Text, useTheme} from 'react-native-paper';
-import {View, ScrollView, StyleSheet} from 'react-native';
+import {Divider, List, Text, useTheme} from 'react-native-paper';
+import {View, ScrollView, StyleSheet, Pressable} from 'react-native';
 import Fonts from './Styles/Fonts';
 import Icon from '@/components/Icon';
 import {Linking} from 'react-native';
@@ -99,10 +99,11 @@ export default function FAQPage(): JSX.Element {
         </List.Accordion>
         <Divider />
       </List.AccordionGroup>
-      <View style={{marginTop: 40}}>
+      <View style={{marginVertical: 40}}>
         <Text
           style={[
             {
+              textTransform: 'uppercase',
               textAlign: 'center',
               marginTop: 10,
               fontSize: 18,
@@ -118,26 +119,26 @@ export default function FAQPage(): JSX.Element {
             justifyContent: 'center',
             gap: 20,
           }}>
-          <Button
-            mode="contained"
+          <Pressable
+            style={[style.btn, {backgroundColor: '#1DA1F2'}]}
             onPress={() => Linking.openURL('https://twitter.com/xogumon')}>
-            <Icon from="fontAwesome5" name="twitter" />
-          </Button>
-          <Button
-            mode="contained"
+            <Icon from="fontAwesome5" name="twitter" style={style.btnIcon} />
+          </Pressable>
+          <Pressable
+            style={[style.btn, {backgroundColor: '#9146FF'}]}
             onPress={() => Linking.openURL('https://www.twitch.tv/xogum')}>
-            <Icon from="fontAwesome5" name="twitch" />
-          </Button>
-          <Button
-            mode="contained"
+            <Icon from="fontAwesome5" name="twitch" style={style.btnIcon} />
+          </Pressable>
+          <Pressable
+            style={[style.btn, {backgroundColor: '#FF0000'}]}
             onPress={() => Linking.openURL('https://www.youtube.com/@xogum')}>
-            <Icon from="fontAwesome5" name="youtube" />
-          </Button>
-          <Button
-            mode="contained"
+            <Icon from="fontAwesome5" name="youtube" style={style.btnIcon} />
+          </Pressable>
+          <Pressable
+            style={[style.btn, {backgroundColor: '#010101'}]}
             onPress={() => Linking.openURL('https://tiktok.com/@xogumon')}>
-            <Icon from="fontAwesome5" name="tiktok" />
-          </Button>
+            <Icon from="fontAwesome5" name="tiktok" style={style.btnIcon} />
+          </Pressable>
         </View>
       </View>
     </ScrollView>
@@ -147,5 +148,17 @@ export default function FAQPage(): JSX.Element {
 const style = StyleSheet.create({
   content: {
     padding: 20,
+  },
+  btn: {
+    borderRadius: 50,
+    width: 50,
+    height: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'blue',
+  },
+  btnIcon: {
+    fontSize: 30,
+    color: '#fff',
   },
 });

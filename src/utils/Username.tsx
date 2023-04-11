@@ -1,4 +1,4 @@
-import slugify from 'slugify';
+import slugify from '@sindresorhus/slugify';
 
 export const REGEX = /^[a-zA-Z0-9_]{3,30}$/;
 
@@ -8,6 +8,6 @@ export default class Username {
   };
 
   static parse = (text: string): string => {
-    return slugify(text);
+    return slugify(text, {preserveCharacters: ['_'], separator: ''});
   };
 }

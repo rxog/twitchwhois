@@ -79,6 +79,24 @@ const Draggable: React.FC<DraggableProps> = ({
     PanResponder.create({
       onStartShouldSetPanResponder: () => true,
       onMoveShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponderCapture: (_evt, gestureState) => {
+        const dx = gestureState.dx;
+        const dy = gestureState.dy;
+
+        if (direction === 'horizontal') {
+          return Math.abs(dx) > Math.abs(dy);
+        }
+
+        if (direction === 'left') {
+          return dx < 0 && Math.abs(dx) > Math.abs(dy);
+        }
+
+        if (direction === 'right') {
+          return dx > 0 && Math.abs(dx) > Math.abs(dy);
+        }
+
+        return true;
+      },
       onPanResponderMove: (_evt, gestureState) => {
         onMove?.(gestureState);
 
@@ -127,6 +145,7 @@ const Draggable: React.FC<DraggableProps> = ({
         setPosition({x: 0, y: 0});
         setOpacity(1);
       },
+      onPanResponderTerminationRequest: () => false,
     }),
   ).current;
 

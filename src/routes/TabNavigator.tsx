@@ -9,12 +9,16 @@ import AboutPage from '@/pages/About';
 import {Text} from 'react-native-paper';
 import Icon from '@/components/Icon';
 import TabButton from '@/components/TabButton';
+import {useSelector} from 'react-redux';
+import {RootState} from '@/store';
 
 const Tab = createBottomTabNavigator();
 
 export default function TabNavigator() {
+  const tasks = useSelector((state: RootState) => state.results)?.length;
   return (
     <Tab.Navigator
+      initialRouteName={tasks > 0 ? 'monitor' : 'search'}
       backBehavior="order"
       screenOptions={{
         headerTitleAlign: 'center',
@@ -47,6 +51,7 @@ export default function TabNavigator() {
           tabBarIcon: props => (
             <Icon from="materialCommunity" name="list-status" {...props} />
           ),
+          tabBarBadge: tasks,
         }}
       />
       <Tab.Screen
