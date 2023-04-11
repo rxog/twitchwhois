@@ -16,13 +16,22 @@ export default async function displayNotification(username: string) {
 
   await notifee.displayNotification({
     title: 'Nome disponível!',
-    body: `<b>${username}</b> está disponível na Twitch!`,
+    body: `@<b>${username}</b> está disponível na Twitch!`,
     android: {
       channelId,
       pressAction: {
         id: 'monitor',
         launchActivity: 'com.twitchwhois.MainActivity',
       },
+      actions: [
+        {
+          title: 'Ir para a Twitch',
+          pressAction: {
+            id: 'go-twitch',
+            launchActivity: 'com.twitchwhois.MainActivity',
+          },
+        },
+      ],
     },
   });
 }

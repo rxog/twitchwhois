@@ -1,8 +1,9 @@
 import React from 'react';
 import SearchPage from '@/pages/Search';
 import TwitchUserPage from '@/pages/TwitchUser';
-import {RouteParams} from '@/utils/types/RouteParams';
+//import {RouteParams} from '@/utils/types/RouteParams';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import TopGamesPage from '@/pages/TopGames';
 
 const Stack = createNativeStackNavigator();
 
@@ -17,14 +18,15 @@ export default function StackNavigator() {
       <Stack.Screen
         component={TwitchUserPage}
         name="twitchuser"
-        options={({route}) => {
+        /* options={({route}) => {
           const params: RouteParams = route.params as RouteParams;
           return {
             title: params?.username,
             headerShown: true,
           };
-        }}
+        }} */
       />
+      <Stack.Screen component={TopGamesPage} name="topgames" />
     </Stack.Navigator>
   );
 }

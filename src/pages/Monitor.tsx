@@ -113,76 +113,13 @@ export default function MonitorPage() {
                 onLeft={async () => {
                   dispatch(actions.removeResult(item.username));
                 }}>
-                <View
-                  style={{
-                    flex: 1,
-                    backgroundColor: colors.secondaryContainer,
-                    paddingHorizontal: 10,
-                    paddingBottom: 10,
-                  }}>
-                  <Text
-                    style={[
-                      fonts.displayMedium,
-                      {
-                        fontWeight: 'bold',
-                        color: colors.onSecondaryContainer,
-                      },
-                    ]}>
-                    {item.username}
-                  </Text>
-                  <Divider />
-                  <Text
-                    style={[
-                      fonts.bodyMedium,
-                      {
-                        color: colors.secondary,
-                      },
-                    ]}>
-                    Última checagem:{'\n'}
-                    {capitalize(
-                      format(
-                        Date.parse(item.lastCheck as string),
-                        'EEEE, dd/MM/yyyy HH:mm:ss',
-                        {
-                          locale: ptBR,
-                        },
-                      ),
-                    )}
-                  </Text>
-                  <Text
-                    style={[
-                      fonts.bodyMedium,
-                      {
-                        color: colors.secondary,
-                      },
-                    ]}>
-                    Próxima checagem:{'\n'}
-                    {item.running
-                      ? isBefore(
-                          Date.parse(item.nextCheck as string),
-                          Date.now(),
-                        )
-                        ? 'Em instantes'
-                        : capitalize(
-                            format(
-                              Date.parse(item.nextCheck as string),
-                              'EEEE, dd/MM/yyyy HH:mm:ss',
-                              {
-                                locale: ptBR,
-                              },
-                            ),
-                          )
-                      : 'Parado'}
-                  </Text>
-                </View>
                 <TouchableRipple
                   style={{
-                    paddingHorizontal: 10,
                     backgroundColor: item.status ? '#66bb6a' : '#f44336',
-                    borderLeftColor: colors.surfaceVariant,
-                    borderLeftWidth: 1,
-                    justifyContent: 'center',
                     alignItems: 'center',
+                    justifyContent: 'center',
+                    flexDirection: 'row',
+                    flex: 1,
                   }}
                   onLongPress={async () => {
                     if (item.running) {
@@ -195,11 +132,75 @@ export default function MonitorPage() {
                   }}
                   onPress={e => e}
                   rippleColor="rgba(0, 0, 0, .32)">
-                  <Icon
-                    from="materialIcons"
-                    name={item.status ? 'mood' : 'mood-bad'}
-                    size={34}
-                  />
+                  <>
+                    <View
+                      style={{
+                        flex: 1,
+                        backgroundColor: colors.secondaryContainer,
+                        paddingHorizontal: 10,
+                        paddingBottom: 10,
+                      }}>
+                      <Text
+                        style={[
+                          fonts.displayMedium,
+                          {
+                            fontWeight: 'bold',
+                            color: colors.onSecondaryContainer,
+                          },
+                        ]}>
+                        {item.username}
+                      </Text>
+                      <Divider />
+                      <Text
+                        style={[
+                          fonts.bodyMedium,
+                          {
+                            color: colors.secondary,
+                          },
+                        ]}>
+                        Última checagem:{'\n'}
+                        {capitalize(
+                          format(
+                            Date.parse(item.lastCheck as string),
+                            'EEEE, dd/MM/yyyy HH:mm:ss',
+                            {
+                              locale: ptBR,
+                            },
+                          ),
+                        )}
+                      </Text>
+                      <Text
+                        style={[
+                          fonts.bodyMedium,
+                          {
+                            color: colors.secondary,
+                          },
+                        ]}>
+                        Próxima checagem:{'\n'}
+                        {item.running
+                          ? isBefore(
+                              Date.parse(item.nextCheck as string),
+                              Date.now(),
+                            )
+                            ? 'Em instantes'
+                            : capitalize(
+                                format(
+                                  Date.parse(item.nextCheck as string),
+                                  'EEEE, dd/MM/yyyy HH:mm:ss',
+                                  {
+                                    locale: ptBR,
+                                  },
+                                ),
+                              )
+                          : 'Parado'}
+                      </Text>
+                    </View>
+                    <Icon
+                      from="materialIcons"
+                      name={item.status ? 'mood' : 'mood-bad'}
+                      size={34}
+                    />
+                  </>
                 </TouchableRipple>
               </Draggable>
             </View>

@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import {ScrollView, View} from 'react-native';
+import {Pressable, ScrollView, View} from 'react-native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import Searchbar from '@/components/Searchbar';
 import {Text, useTheme} from 'react-native-paper';
@@ -20,40 +20,60 @@ export default function SearchPage({
         justifyContent: 'center',
         alignItems: 'center',
       }}>
-      <View style={{marginBottom: 20}}>
-        <Text
-          style={[
-            fonts.headlineLarge,
-            {
-              fontFamily: Fonts.TwitchyTV.fontFamily,
-              color: colors.onSurfaceVariant,
-            },
-          ]}>
-          Twitch
-          <View
-            style={{
-              transform: [
-                {
-                  rotate: '-10deg',
-                },
-                {
-                  translateY: 6,
-                },
-              ],
-            }}>
-            <Text
-              style={[
-                fonts.headlineLarge,
-                {
-                  color: colors.onSecondaryContainer,
-                  fontFamily: Fonts.TalkComic.fontFamily,
-                },
-              ]}>
-              Who
-            </Text>
-          </View>
-          Is
-        </Text>
+      <View style={{marginBottom: 20, flexDirection: 'row'}}>
+        <View>
+          <Text
+            style={[
+              fonts.headlineLarge,
+              {
+                fontFamily: Fonts.TwitchyTV.fontFamily,
+                color: colors.onSurfaceVariant,
+              },
+            ]}>
+            Twitch
+          </Text>
+        </View>
+        <View
+          style={{
+            transform: [
+              {
+                rotate: '-10deg',
+              },
+              {
+                translateY: -2,
+              },
+            ],
+          }}>
+          <Text
+            style={[
+              fonts.headlineLarge,
+              {
+                color: colors.secondary,
+                fontFamily: Fonts.TalkComic.fontFamily,
+              },
+            ]}>
+            Who
+          </Text>
+        </View>
+        <View
+          style={{
+            transform: [
+              {
+                rotate: '10deg',
+              },
+            ],
+          }}>
+          <Text
+            style={[
+              fonts.headlineLarge,
+              {
+                fontFamily: Fonts.TwitchyTV.fontFamily,
+                color: colors.onSurfaceVariant,
+              },
+            ]}>
+            Is
+          </Text>
+        </View>
       </View>
       <Searchbar
         onSubmit={query => {
@@ -62,6 +82,19 @@ export default function SearchPage({
           });
         }}
       />
+      <View style={{marginVertical: 20}}>
+        <Pressable
+          onPress={() => {
+            navigation.navigate('topgames');
+          }}>
+          <Text
+            style={{
+              textDecorationLine: 'underline',
+            }}>
+            Trending games (Top 10)
+          </Text>
+        </Pressable>
+      </View>
     </ScrollView>
   );
 }

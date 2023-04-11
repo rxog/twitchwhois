@@ -69,7 +69,6 @@ export default function Searchbar({
         value={searchQuery}
         onChangeText={onChangeText}
         placeholder="Pesquisar"
-        autoFocus={!isLoading}
         autoCapitalize="none"
         autoComplete="username"
         autoCorrect={false}

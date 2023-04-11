@@ -35,7 +35,6 @@ export default function RunBackgroundTask() {
         const timeouted = isBefore(next, now);
 
         if (timeouted) {
-          console.log('Timeouted!');
           await TwitchAPI.isAvailable(username, signal).then(async status => {
             if (status) {
               displayNotification(username);
@@ -63,6 +62,6 @@ export default function RunBackgroundTask() {
     } catch (err) {
       console.log(err);
     }
-    await Sleep(1000);
+    await Sleep(15000);
   });
 }

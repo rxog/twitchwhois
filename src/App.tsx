@@ -1,5 +1,5 @@
 import React from 'react';
-import {StatusBar} from 'react-native';
+import {Linking, StatusBar} from 'react-native';
 import notifee, {EventType} from '@notifee/react-native';
 import Navigation from './routes';
 import {
@@ -35,8 +35,10 @@ function App(): JSX.Element {
       if (type === EventType.PRESS) {
         const screen = pressAction?.id;
 
-        if (screen) {
-          navigationRef.current?.navigate(screen);
+        if (screen === 'go-twitch') {
+          Linking.openURL('https://twitch.tv/');
+        } else if (screen && navigationRef.current) {
+          navigationRef.current.navigate(screen);
         }
 
         if (notification?.id && typeof notification.id === 'string') {

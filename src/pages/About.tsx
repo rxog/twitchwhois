@@ -6,7 +6,7 @@ import Fonts from './Styles/Fonts';
 import Icon from '@/components/Icon';
 import {Linking} from 'react-native';
 
-export default function FAQPage(): JSX.Element {
+export default function AboutPage(): JSX.Element {
   const {fonts} = useTheme();
 
   return (
