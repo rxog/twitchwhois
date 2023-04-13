@@ -36,12 +36,16 @@ export default function RunBackgroundTask() {
 
         if (timeouted) {
           await TwitchAPI.isAvailable(username, signal).then(async status => {
-            if (status) {
+            if (status === 1) {
               displayNotification(username);
               dispatch(
                 actions.saveResult({
                   username,
-                  running: false,
+                  lastCheck: now.toISOString(),
+                  nextCheck: addMinutes(
+                    now,
+                    settings.interval * 2,
+                  ).toISOString(),
                   status,
                 }),
               );

@@ -1,18 +1,25 @@
-/* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable react-native/no-inline-styles */
-import React, {useLayoutEffect, useState} from 'react';
+import React, {
+  useLayoutEffect,
+  useState,
+  useRef,
+  useCallback,
+  useMemo,
+} from 'react';
 import {
   View,
+  Image,
   ImageBackground,
   RefreshControl,
   Vibration,
   Linking,
   ToastAndroid,
-  ScrollView,
-  Image,
   Dimensions,
   FlatList,
+  Animated,
+  ScrollView,
 } from 'react-native';
 import Twitch from '@/utils/TwitchAPI';
 import ptBR from 'date-fns/locale/pt-BR';
@@ -39,6 +46,7 @@ import {
   ActivityIndicator,
   MD3Colors,
   Tooltip,
+  TouchableRipple,
 } from 'react-native-paper';
 import addMinutes from 'date-fns/addMinutes';
 import ResultBox from '@/components/ResultBox';
@@ -46,20 +54,19 @@ import LinearGradient from 'react-native-linear-gradient';
 import Fonts from './Styles/Fonts';
 import {capitalize, uniqBy} from 'lodash';
 import Uptime from '@/utils/Uptime';
-import {TwitchData} from '@/utils/types/TwitchData';
-import {Pressable} from 'react-native';
+import {TwitchAllData} from '@/utils/types/TwitchData';
 import BackgroundTask from '@/modules/BackgroundTask';
 import RunBackgroundTask from '@/modules/RunBackgroundTask';
 
 const WINDOW_WIDTH = Dimensions.get('window').width;
 const THUMBNAIL_WIDTH = WINDOW_WIDTH * 0.8 - 20;
-const THUMBNAIL_HEIGHT = WINDOW_WIDTH / 2.4;
+//const THUMBNAIL_HEIGHT = WINDOW_WIDTH / 2.4;
 
 export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
   const dispatch = useDispatch();
   const store = useStore<RootState>();
   const {settings} = store.getState();
-  const [userdata, setUserData] = useState<TwitchData | null>(null);
+  const [userdata, setUserData] = useState<TwitchAllData | null>(null);
   const [backgroundImage, setBackgroundImage] = useState<string | undefined>();
   const [isAvailable, setIsAvailable] = useState<number | null>(null);
   const [refreshing, setRefreshing] = useState(false);
@@ -69,9 +76,25 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
   const route = useRoute();
   const params: RouteParams = route.params as RouteParams;
   const username = params.username as string;
+  const [backgroundSize, setBackgroundSize] = useState({width: 0, height: 0});
+  const [scrollY, setScrollY] = useState(0);
+  const scrollViewRef = useRef<ScrollView>(null);
+  const animatedBackButton = useRef(new Animated.Value(0)).current;
+  const backButtonPosition = useCallback(
+    () => (scrollY > backgroundSize.height ? 'top' : 'screen'),
+    [scrollY, backgroundSize.height],
+  );
 
-  const fetchUserData = async () => {
-    return await Twitch.getAllData(username)
+  useMemo(() => {
+    Animated.timing(animatedBackButton, {
+      toValue: backButtonPosition() === 'screen' ? 0 : 1,
+      duration: 100,
+      useNativeDriver: true,
+    }).start();
+  }, [backButtonPosition()]);
+
+  const fetchUserData = () => {
+    Twitch.getAllData(username)
       .then(async data => {
         if (data) {
           setUserData(data);
@@ -182,6 +205,12 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
 
   return (
     <ScrollView
+      ref={scrollViewRef}
+      scrollEventThrottle={16}
+      onScroll={({nativeEvent: {contentOffset}}) => {
+        setScrollY(contentOffset.y);
+      }}
+      stickyHeaderIndices={[1]}
       refreshControl={
         <RefreshControl
           refreshing={refreshing}
@@ -192,17 +221,24 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
         />
       }>
       <ImageBackground
+        onLayout={event => {
+          const {width, height} = event.nativeEvent.layout;
+          setBackgroundSize({width, height});
+        }}
         source={{
           uri: backgroundImage,
         }}
         style={{
           flex: 1,
+          padding: 20,
+          overflow: 'hidden',
           alignItems: 'center',
           justifyContent: 'center',
+          paddingBottom: 25,
         }}
         resizeMode="cover">
         <LinearGradient
-          colors={['transparent', '#000']}
+          colors={[colors.backdrop, colors.primaryContainer]}
           style={{
             position: 'absolute',
             top: 0,
@@ -211,16 +247,27 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
             bottom: 0,
           }}
         />
-        <View style={{marginTop: 15}}>
+        <View>
           {userdata && userdata.hasOwnProperty('profile_image_url') && (
-            <Avatar.Image
-              size={150}
-              source={{uri: userdata.profile_image_url}}
-            />
+            <View
+              style={{
+                borderWidth: 6,
+                borderColor: userdata.color?.length
+                  ? userdata.color
+                  : 'transparent',
+                borderRadius: 100,
+              }}>
+              <Avatar.Image
+                size={150}
+                style={{backgroundColor: userdata.color}}
+                source={{uri: userdata.profile_image_url}}
+              />
+            </View>
           )}
           {userdata &&
             userdata.stream &&
-            userdata.stream.hasOwnProperty('started_at') && (
+            userdata.stream.type &&
+            !!userdata.stream.type.length && (
               <Badge
                 size={30}
                 style={{
@@ -233,9 +280,7 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
                 onPress={() =>
                   Linking.openURL(`https://www.twitch.tv/${username}`)
                 }>
-                {userdata.stream?.type && userdata.stream?.type === 'live'
-                  ? 'AO VIVO'
-                  : 'RERUN'}
+                {userdata.stream.type === 'live' ? 'AO VIVO' : 'RERUN'}
               </Badge>
             )}
         </View>
@@ -255,71 +300,135 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
                 textShadowOffset: {width: 2, height: 2},
                 textShadowRadius: 5,
                 textShadowColor: colors.shadow,
-                transform: [
-                  {
-                    translateY: -1,
-                  },
-                ],
               },
             ]}>
             {userdata?.display_name}
           </Text>
-          {userdata?.broadcaster_type === 'partner' && (
-            <Icon
-              style={{
-                textShadowOffset: {width: 0, height: 0},
-                textShadowRadius: 20,
-                textShadowColor: colors.shadow,
-              }}
-              from="materialIcons"
-              name="verified"
-              size={36}
-              color={MD3Colors.tertiary90}
-            />
-          )}
+          {userdata &&
+            userdata.broadcaster_type &&
+            userdata.broadcaster_type === 'partner' && (
+              <Icon
+                style={{
+                  textShadowOffset: {width: 0, height: 0},
+                  textShadowRadius: 20,
+                  textShadowColor: colors.shadow,
+                }}
+                from="materialIcons"
+                name="verified"
+                size={36}
+                color={MD3Colors.tertiary80}
+              />
+            )}
         </View>
-        <Text
-          style={[
-            fonts.bodyMedium,
-            {
-              color: '#ccc',
-              textShadowOffset: {width: 2, height: 2},
-              textShadowRadius: 5,
-              textShadowColor: colors.shadow,
-              textAlign: 'center',
-              marginBottom: 15,
-              paddingHorizontal: 20,
-            },
-          ]}>
-          {userdata?.description}
-        </Text>
+        {userdata && userdata.login && !!userdata.login.length && (
+          <Text
+            variant="headlineSmall"
+            style={[
+              {
+                color: MD3Colors.tertiary80,
+                textAlign: 'center',
+                paddingBottom: 10,
+              },
+            ]}>
+            @{userdata.login}
+          </Text>
+        )}
+        {userdata && userdata.description && !!userdata.description.length && (
+          <Text
+            variant="bodyMedium"
+            numberOfLines={3}
+            style={[
+              {
+                color: MD3Colors.neutralVariant99,
+                textShadowOffset: {width: 1, height: 1},
+                textShadowRadius: 5,
+                textShadowColor: colors.shadow,
+                textAlign: 'center',
+                paddingHorizontal: 20,
+              },
+            ]}>
+            {userdata.description}
+          </Text>
+        )}
       </ImageBackground>
-      <Card style={{borderRadius: 0, paddingHorizontal: 10}}>
-        <Card.Actions
+      <Card
+        mode="elevated"
+        style={{
+          marginTop: -10,
+        }}>
+        <Card.Content
           style={{
             flexDirection: 'row',
-            gap: 5,
+            justifyContent: 'space-between',
           }}>
-          <Button
-            onPress={() =>
-              Linking.openURL(`https://www.twitch.tv/${username}`)
-            }>
-            Seguir
-          </Button>
-          {userdata?.broadcaster_type && (
+          <View
+            style={{
+              gap: 8,
+              flex: 1,
+              flexDirection: 'row',
+            }}>
             <Button
+              mode="contained-tonal"
               onPress={() =>
-                Linking.openURL(`https://twitch.tv/subs/${username}`)
+                Linking.openURL(`https://www.twitch.tv/${username}`)
               }>
-              Inscrever-se
+              Seguir
             </Button>
-          )}
-        </Card.Actions>
+            {userdata?.broadcaster_type && (
+              <Button
+                mode="contained"
+                onPress={() =>
+                  Linking.openURL(`https://twitch.tv/subs/${username}`)
+                }>
+                Inscrever-se
+              </Button>
+            )}
+          </View>
+          <Animated.View
+            style={[
+              {
+                borderRadius: 100,
+                overflow: 'hidden',
+                transform: [
+                  {
+                    rotate: animatedBackButton.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: ['0deg', '90deg'],
+                    }),
+                  },
+                ],
+              },
+            ]}>
+            <TouchableRipple
+              style={{
+                padding: 10,
+              }}
+              onPress={() => {
+                if (backButtonPosition() === 'top') {
+                  scrollViewRef.current?.scrollTo({y: 0, x: 0, animated: true});
+                  return;
+                }
+
+                navigation.canGoBack() && navigation.goBack();
+              }}>
+              <Text>
+                <Icon from="materialIcons" name="arrow-back" size={20} />
+              </Text>
+            </TouchableRipple>
+          </Animated.View>
+        </Card.Content>
       </Card>
+      <Text
+        variant="headlineMedium"
+        style={[
+          Fonts.TwitchyTV,
+          {
+            margin: 10,
+          },
+        ]}>
+        conta
+      </Text>
       <List.Section>
-        <List.Subheader style={Fonts.RobotoRegular}>
-          Informações da conta
-        </List.Subheader>
         {userdata && userdata.hasOwnProperty('broadcaster_type') && (
           <>
             <Divider />
@@ -345,6 +454,17 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
               descriptionStyle={Fonts.RobotoLight}
               title="ID"
               description={userdata.id}
+            />
+          </>
+        )}
+        {userdata && userdata.login && (
+          <>
+            <Divider />
+            <List.Item
+              titleStyle={Fonts.RobotoRegular}
+              descriptionStyle={Fonts.RobotoLight}
+              title="Cor"
+              description={userdata.color}
             />
           </>
         )}
@@ -487,12 +607,15 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
                 const mergedBadges = userdata.badges?.flatMap(badges => {
                   const uniqBadges = uniqBy(badges?.versions, 'title');
                   return uniqBadges.map(badge => (
-                    <Tooltip title={badge.title as string} key={badge.id}>
+                    <Tooltip
+                      enterTouchDelay={0}
+                      title={badge.title as string}
+                      key={badge.id}>
                       <Image
                         source={{
-                          uri: badge.image_url_1x,
-                          width: 18,
-                          height: 18,
+                          uri: badge.image_url_2x,
+                          width: 36,
+                          height: 36,
                         }}
                       />
                     </Tooltip>
@@ -501,10 +624,11 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
                 return (
                   <View
                     style={{
-                      flexDirection: 'row',
+                      gap: 10,
                       flexWrap: 'wrap',
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
                       marginTop: 5,
-                      gap: 5,
                     }}>
                     {mergedBadges}
                   </View>
@@ -526,12 +650,15 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
               title="Emotes"
               description={() => {
                 const emotes = userdata.emotes?.map(emote => (
-                  <Tooltip title={emote.name as string} key={emote.id}>
+                  <Tooltip
+                    enterTouchDelay={0}
+                    title={emote.name as string}
+                    key={emote.id}>
                     <Image
                       source={{
-                        uri: emote.images?.url_1x,
-                        width: 28,
-                        height: 28,
+                        uri: emote.images?.url_2x,
+                        width: 36,
+                        height: 36,
                       }}
                     />
                   </Tooltip>
@@ -539,9 +666,10 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
                 return (
                   <View
                     style={{
-                      flexDirection: 'row',
-                      flexWrap: 'wrap',
                       gap: 10,
+                      flexWrap: 'wrap',
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
                       marginTop: 5,
                     }}>
                     {emotes}
@@ -576,14 +704,15 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
         <>
           <Divider />
           <Text
+            variant="headlineMedium"
             style={[
-              fonts.headlineMedium,
+              Fonts.TwitchyTV,
               {
                 marginTop: 20,
-                marginHorizontal: 15,
+                marginHorizontal: 10,
               },
             ]}>
-            Top clips
+            clips
           </Text>
           <FlatList
             data={userdata?.clips || []}
@@ -600,52 +729,44 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
             renderItem={({item}) => {
               const imageSource = item.thumbnail_url?.replace(
                 '%{width}x%{height}',
-                '1280x720',
+                '480x272',
               );
               return (
-                <Pressable
+                <Card
                   onPress={() => Linking.openURL(item?.url as string)}
                   style={{
                     marginHorizontal: 10,
+                    width: THUMBNAIL_WIDTH,
                   }}>
-                  <Image
+                  <Card.Cover
                     source={{
                       uri: imageSource,
                     }}
-                    style={{
-                      height: THUMBNAIL_HEIGHT,
-                      width: THUMBNAIL_WIDTH,
-                      borderRadius: 4,
-                      overflow: 'hidden',
-                    }}
                   />
-                  <Divider />
-                  <Text
-                    style={{
-                      position: 'absolute',
-                      backgroundColor: colors.backdrop,
-                      padding: 5,
-                    }}>
-                    <Icon from="ionicons" name="eye-outline" />{' '}
-                    {item.view_count} views
-                  </Text>
-                  <Text
-                    style={{
-                      marginTop: 10,
-                      width: THUMBNAIL_WIDTH,
-                    }}>
-                    {item.title}
-                  </Text>
-                  <Divider />
-                  <Text>
-                    {capitalize(
-                      format(
-                        Date.parse(item?.created_at as string),
-                        'dd/MM/yy HH:mm:ss',
-                      ),
-                    )}
-                  </Text>
-                </Pressable>
+                  <Card.Content>
+                    <Text
+                      numberOfLines={1}
+                      variant="bodyMedium"
+                      ellipsizeMode="tail"
+                      style={{marginTop: 10}}>
+                      {item.title}
+                    </Text>
+                    <Divider />
+                    <Text variant="bodySmall">
+                      {capitalize(
+                        formatDistanceToNow(
+                          Date.parse(item?.created_at as string),
+                          {
+                            locale: ptBR,
+                            addSuffix: true,
+                          },
+                        ),
+                      )}{' '}
+                      - {Number(item.view_count).toLocaleString('pt-BR')}{' '}
+                      visualizações
+                    </Text>
+                  </Card.Content>
+                </Card>
               );
             }}
             style={{
@@ -658,14 +779,15 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
         <>
           <Divider />
           <Text
+            variant="headlineMedium"
             style={[
-              fonts.headlineMedium,
+              Fonts.TwitchyTV,
               {
                 marginTop: 20,
-                marginHorizontal: 15,
+                marginHorizontal: 10,
               },
             ]}>
-            Top vídeos
+            vídeos
           </Text>
           <FlatList
             data={
@@ -687,55 +809,48 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
                 userdata?.stream?.id === item.stream_id
                   ? userdata?.stream?.thumbnail_url?.replace(
                       '{width}x{height}',
-                      '1280x720',
+                      '480x272',
                     )
                   : item.thumbnail_url?.replace(
                       '%{width}x%{height}',
-                      '1280x720',
+                      '480x272',
                     );
               return (
-                <Pressable
+                <Card
                   onPress={() => Linking.openURL(item?.url as string)}
                   style={{
                     marginHorizontal: 10,
+                    width: THUMBNAIL_WIDTH,
                   }}>
-                  <Image
+                  <Card.Cover
                     source={{
                       uri: imageSource,
                     }}
-                    style={{
-                      height: THUMBNAIL_HEIGHT,
-                      width: THUMBNAIL_WIDTH,
-                      borderRadius: 4,
-                      overflow: 'hidden',
-                    }}
                   />
-                  <Text
-                    style={{
-                      position: 'absolute',
-                      backgroundColor: colors.backdrop,
-                      padding: 5,
-                    }}>
-                    <Icon from="ionicons" name="eye-outline" />{' '}
-                    {item.view_count} views
-                  </Text>
-                  <Text
-                    style={{
-                      marginTop: 10,
-                      width: THUMBNAIL_WIDTH,
-                    }}>
-                    {item.title}
-                  </Text>
-                  <Divider />
-                  <Text>
-                    {capitalize(
-                      format(
-                        Date.parse(item?.created_at as string),
-                        'dd/MM/yy HH:mm:ss',
-                      ),
-                    )}
-                  </Text>
-                </Pressable>
+                  <Card.Content>
+                    <Text
+                      numberOfLines={1}
+                      variant="bodyMedium"
+                      ellipsizeMode="tail"
+                      style={{marginTop: 10}}>
+                      {item.title}
+                    </Text>
+                    <Divider />
+                    <Text variant="bodySmall">
+                      {capitalize(
+                        formatDistanceToNow(
+                          Date.parse(item?.published_at as string),
+                          {
+                            locale: ptBR,
+                            addSuffix: true,
+                          },
+                        ),
+                      )}{' '}
+                      - {Number(item.view_count).toLocaleString('pt-BR')}{' '}
+                      visualizações
+                    </Text>
+                  </Card.Content>
+                </Card>
               );
             }}
             style={{

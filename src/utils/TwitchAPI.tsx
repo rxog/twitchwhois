@@ -1,6 +1,6 @@
 import axios, {AxiosInstance} from 'axios';
 import {
-  TwitchData,
+  TwitchAllData,
   TwitchTopGameStreams,
   TwitchTopGames,
 } from './types/TwitchData';
@@ -11,7 +11,7 @@ export default class Twitch {
     baseURL: 'https://twitchwhois-backend.vercel.app/api/',
   });
 
-  static async getAllData(username: string): Promise<TwitchData | null> {
+  static async getAllData(username: string): Promise<TwitchAllData | null> {
     try {
       const twitchUser = await this.API.get(`getalldata/${username}`);
       return twitchUser.data;
@@ -32,7 +32,7 @@ export default class Twitch {
 
   static async topGameStreams(): Promise<TwitchTopGameStreams[] | null> {
     try {
-      const response = await this.API.get('topgamestreams/10');
+      const response = await this.API.get('topgamestreams/5');
       return response.data;
     } catch (err) {
       console.log(err);

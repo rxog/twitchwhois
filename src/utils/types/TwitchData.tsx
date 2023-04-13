@@ -1,4 +1,4 @@
-export interface TwitchData {
+export interface TwitchAllData {
   id?: string;
   login?: string;
   display_name?: string;
@@ -9,8 +9,12 @@ export interface TwitchData {
   offline_image_url?: string;
   view_count?: number;
   created_at?: string;
+  color?: string;
   channel?: Channel;
+  chatstate?: Chatstate[];
   stream?: Stream;
+  soundtrack?: null;
+  schedule?: null;
   badges?: Badge[];
   emotes?: Emote[];
   videos?: Video[];
@@ -29,13 +33,8 @@ export interface Version {
   image_url_4x?: string;
   title?: string;
   description?: string;
-  click_action?: ClickAction;
+  click_action?: string;
   click_url?: null | string;
-}
-
-export enum ClickAction {
-  SubscribeToChannel = 'subscribe_to_channel',
-  VisitURL = 'visit_url',
 }
 
 export interface Channel {
@@ -49,6 +48,17 @@ export interface Channel {
   delay?: number;
   tags?: string[];
   follows?: number;
+}
+
+export interface Chatstate {
+  broadcaster_id?: string;
+  slow_mode?: boolean;
+  slow_mode_wait_time?: null;
+  follower_mode?: boolean;
+  follower_mode_duration?: number;
+  subscriber_mode?: boolean;
+  emote_mode?: boolean;
+  unique_chat_mode?: boolean;
 }
 
 export interface Clip {
@@ -75,33 +85,17 @@ export interface Emote {
   name?: string;
   images?: Images;
   tier?: string;
-  emote_type?: EmoteType;
+  emote_type?: string;
   emote_set_id?: string;
-  format?: Format[];
+  format?: string[];
   scale?: string[];
-  theme_mode?: ThemeMode[];
-}
-
-export enum EmoteType {
-  Bitstier = 'bitstier',
-  Follower = 'follower',
-  Subscriptions = 'subscriptions',
-}
-
-export enum Format {
-  Animated = 'animated',
-  Static = 'static',
+  theme_mode?: string[];
 }
 
 export interface Images {
   url_1x?: string;
   url_2x?: string;
   url_4x?: string;
-}
-
-export enum ThemeMode {
-  Dark = 'dark',
-  Light = 'light',
 }
 
 export interface Stream {

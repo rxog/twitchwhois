@@ -54,6 +54,8 @@ export default function Searchbar({
     }
   };
 
+  const textInputColor = hasError ? colors.error : colors.onSecondaryContainer;
+
   return (
     <View
       style={{
@@ -61,7 +63,7 @@ export default function Searchbar({
         alignItems: 'center',
         backgroundColor: hasError
           ? colors.errorContainer
-          : colors.surfaceVariant,
+          : colors.secondaryContainer,
         borderRadius: 25,
       }}>
       <TextInput
@@ -74,7 +76,7 @@ export default function Searchbar({
         autoCorrect={false}
         editable={!isLoading}
         onSubmitEditing={onSubmit}
-        placeholderTextColor={colors.onSurfaceVariant}
+        placeholderTextColor={textInputColor}
         selectTextOnFocus={true}
         returnKeyType="search"
         style={[
@@ -82,7 +84,7 @@ export default function Searchbar({
             flex: 1,
             alignSelf: 'stretch',
             fontSize: 18,
-            color: hasError ? colors.error : colors.onSurfaceVariant,
+            color: textInputColor,
             paddingLeft: 45,
           },
         ]}
@@ -91,6 +93,8 @@ export default function Searchbar({
       />
       <Pressable
         style={{
+          overflow: 'hidden',
+          borderRadius: 100,
           position: 'absolute',
           left: 10,
         }}
@@ -98,13 +102,15 @@ export default function Searchbar({
         <Icon
           from="materialIcons"
           name="search"
-          color={hasError ? colors.error : colors.onSurfaceVariant}
+          color={textInputColor}
           size={30}
         />
       </Pressable>
       {searchQuery && (
         <Pressable
           style={{
+            overflow: 'hidden',
+            borderRadius: 100,
             position: 'absolute',
             right: 10,
           }}

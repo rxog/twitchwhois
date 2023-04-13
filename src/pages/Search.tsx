@@ -1,9 +1,9 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import {Pressable, ScrollView, View} from 'react-native';
+import {ScrollView, View} from 'react-native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import Searchbar from '@/components/Searchbar';
-import {Text, useTheme} from 'react-native-paper';
+import {Button, Text, useTheme} from 'react-native-paper';
 import Fonts from './Styles/Fonts';
 
 export default function SearchPage({
@@ -12,6 +12,7 @@ export default function SearchPage({
   navigation: NativeStackNavigationProp<any>;
 }): JSX.Element {
   const {colors, fonts} = useTheme();
+
   return (
     <ScrollView
       contentContainerStyle={{
@@ -29,18 +30,22 @@ export default function SearchPage({
                 fontFamily: Fonts.TwitchyTV.fontFamily,
                 color: colors.onSurfaceVariant,
               },
+              {
+                textShadowColor: 'black',
+                textShadowRadius: 10,
+                textShadowOffset: {height: 1, width: 1},
+                elevation: 2,
+              },
             ]}>
             Twitch
           </Text>
         </View>
         <View
           style={{
+            zIndex: 999,
             transform: [
               {
-                rotate: '-10deg',
-              },
-              {
-                translateY: -2,
+                rotate: '-20deg',
               },
             ],
           }}>
@@ -48,27 +53,33 @@ export default function SearchPage({
             style={[
               fonts.headlineLarge,
               {
+                marginHorizontal: -5,
                 color: colors.secondary,
                 fontFamily: Fonts.TalkComic.fontFamily,
+              },
+              {
+                textShadowColor: 'black',
+                textShadowRadius: 10,
+                textShadowOffset: {height: 1, width: 1},
+                elevation: 2,
               },
             ]}>
             Who
           </Text>
         </View>
-        <View
-          style={{
-            transform: [
-              {
-                rotate: '10deg',
-              },
-            ],
-          }}>
+        <View>
           <Text
             style={[
               fonts.headlineLarge,
               {
                 fontFamily: Fonts.TwitchyTV.fontFamily,
                 color: colors.onSurfaceVariant,
+              },
+              {
+                textShadowColor: 'black',
+                textShadowRadius: 10,
+                textShadowOffset: {height: 1, width: 1},
+                elevation: 2,
               },
             ]}>
             Is
@@ -83,17 +94,13 @@ export default function SearchPage({
         }}
       />
       <View style={{marginVertical: 20}}>
-        <Pressable
+        <Button
+          mode="elevated"
           onPress={() => {
-            navigation.navigate('topgames');
+            navigation.navigate('trending');
           }}>
-          <Text
-            style={{
-              textDecorationLine: 'underline',
-            }}>
-            Trending games (Top 10)
-          </Text>
-        </Pressable>
+          Trending
+        </Button>
       </View>
     </ScrollView>
   );

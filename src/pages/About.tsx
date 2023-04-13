@@ -101,14 +101,12 @@ export default function AboutPage(): JSX.Element {
       </List.AccordionGroup>
       <View style={{marginVertical: 40}}>
         <Text
+          variant="bodyMedium"
           style={[
             {
-              textTransform: 'uppercase',
               textAlign: 'center',
-              marginTop: 10,
-              fontSize: 18,
             },
-            Fonts.Neodigital,
+            Fonts.TwitchyTV,
           ]}>
           Siga o Xogum nas redes:
         </Text>
