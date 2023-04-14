@@ -15,7 +15,7 @@ type Options = {
 const defaultOptions: Options = {
   taskName: 'background-task',
   taskTitle: displayName,
-  taskDesc: '',
+  taskDesc: 'Monitorando',
   taskIcon: {
     type: 'mipmap',
     name: 'ic_launcher_round',

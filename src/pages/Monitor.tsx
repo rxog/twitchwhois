@@ -1,7 +1,7 @@
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable react-native/no-inline-styles */
 import React, {useMemo} from 'react';
-import {View, FlatList, StyleSheet} from 'react-native';
+import {View, FlatList, StyleSheet, Alert} from 'react-native';
 import format from 'date-fns/format';
 import ptBR from 'date-fns/locale/pt-BR';
 import {RootState} from '@/store';
@@ -12,6 +12,7 @@ import isBefore from 'date-fns/isBefore';
 import capitalize from 'lodash/capitalize';
 import Icon from '@/components/Icon';
 import {sortBy} from 'lodash';
+import Layout from '@/components/Layout';
 
 export default function MonitorPage() {
   const {colors} = useTheme();
@@ -25,19 +26,6 @@ export default function MonitorPage() {
   }, [reduxData]);
 
   const style = StyleSheet.create({
-    listContent: {
-      flex: 1,
-      overflow: 'hidden',
-      marginHorizontal: 10,
-      borderRadius: 10,
-      marginBottom: 10,
-      flexWrap: 'wrap',
-      borderColor: colors.surfaceVariant,
-      borderWidth: 1,
-    },
-    firstItem: {
-      marginTop: 10,
-    },
     headerComponent: {
       flexDirection: 'row',
       justifyContent: 'space-evenly',
@@ -46,7 +34,6 @@ export default function MonitorPage() {
       borderBottomWidth: StyleSheet.hairlineWidth,
       marginBottom: 10,
       padding: 10,
-      gap: 10,
     },
     Available: {
       flexDirection: 'row',
@@ -56,117 +43,136 @@ export default function MonitorPage() {
   });
 
   return (
-    <FlatList
-      data={results}
-      keyExtractor={item => item.username}
-      stickyHeaderIndices={[0]}
-      style={{
-        gap: 20,
-      }}
-      ListHeaderComponent={() => (
-        <View style={style.headerComponent}>
-          <View style={style.Available}>
-            <Text>Disponível: </Text>
-            <Icon from="materialIcons" name="mood" size={30} color="#66bb6a" />
+    <Layout title="monitor">
+      <FlatList
+        data={results}
+        keyExtractor={item => item.username}
+        ListHeaderComponent={() => (
+          <View style={style.headerComponent}>
+            <View style={style.Available}>
+              <Text>Disponível: </Text>
+              <Icon
+                from="materialIcons"
+                name="mood"
+                size={30}
+                color="#66bb6a"
+              />
+            </View>
+            <View style={style.NotAvailable}>
+              <Text>Indisponível: </Text>
+              <Icon
+                from="materialIcons"
+                name="mood-bad"
+                color="#f44336"
+                size={30}
+              />
+            </View>
           </View>
-          <View style={style.NotAvailable}>
-            <Text>Indisponível: </Text>
-            <Icon
-              from="materialIcons"
-              name="mood-bad"
-              color="#f44336"
-              size={30}
-            />
-          </View>
-        </View>
-      )}
-      renderItem={({item}) => {
-        return (
-          <Card
-            style={{
-              marginHorizontal: 10,
-              marginBottom: 10,
-            }}>
-            <Card.Content>
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <Icon
-                  color={item.status ? '#66bb6a' : '#f44336'}
-                  from="materialIcons"
-                  name={item.status ? 'mood' : 'mood-bad'}
-                  size={40}
-                />
-                <Text
-                  variant="displayMedium"
-                  style={[
-                    {
-                      fontWeight: 'bold',
-                      marginTop: -5,
-                    },
-                  ]}>
-                  {item.username}
+        )}
+        renderItem={({item}) => {
+          return (
+            <Card
+              style={{
+                marginHorizontal: 10,
+                marginBottom: 10,
+              }}>
+              <Card.Content>
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                  <Icon
+                    color={item.status ? '#66bb6a' : '#f44336'}
+                    from="materialIcons"
+                    name={item.status ? 'mood' : 'mood-bad'}
+                    size={40}
+                  />
+                  <Text
+                    variant="displayMedium"
+                    style={[
+                      {
+                        fontWeight: 'bold',
+                        marginTop: -5,
+                        color: colors.primary,
+                      },
+                    ]}>
+                    {item.username}
+                  </Text>
+                </View>
+                <Divider style={{marginVertical: 10}} />
+                <Text variant="bodySmall">
+                  Última checagem:{'\n'}
+                  {capitalize(
+                    format(
+                      Date.parse(item.lastCheck as string),
+                      'EEEE, dd/MM/yyyy HH:mm:ss',
+                      {
+                        locale: ptBR,
+                      },
+                    ),
+                  )}
+                  {'\n\n'}
+                  Próxima checagem:{'\n'}
+                  {item.running
+                    ? isBefore(Date.parse(item.nextCheck as string), Date.now())
+                      ? 'Em instantes'
+                      : capitalize(
+                          format(
+                            Date.parse(item.nextCheck as string),
+                            'EEEE, dd/MM/yyyy HH:mm:ss',
+                            {
+                              locale: ptBR,
+                            },
+                          ),
+                        )
+                    : 'Parado'}
                 </Text>
-              </View>
-              <Divider style={{marginVertical: 10}} />
-              <Text variant="bodySmall">
-                Última checagem:{'\n'}
-                {capitalize(
-                  format(
-                    Date.parse(item.lastCheck as string),
-                    'EEEE, dd/MM/yyyy HH:mm:ss',
-                    {
-                      locale: ptBR,
-                    },
-                  ),
-                )}
-                {'\n\n'}
-                Próxima checagem:{'\n'}
-                {item.running
-                  ? isBefore(Date.parse(item.nextCheck as string), Date.now())
-                    ? 'Em instantes'
-                    : capitalize(
-                        format(
-                          Date.parse(item.nextCheck as string),
-                          'EEEE, dd/MM/yyyy HH:mm:ss',
-                          {
-                            locale: ptBR,
+                <Divider style={{marginTop: 10}} />
+              </Card.Content>
+              <Card.Actions>
+                <Button
+                  mode="elevated"
+                  textColor={colors.error}
+                  buttonColor={colors.errorContainer}
+                  onPress={async () => {
+                    Alert.alert(
+                      `Apagar @${item.username}?`,
+                      'Essa ação não pode ser desfeita.',
+                      [
+                        {
+                          text: 'Apagar',
+                          onPress: () => {
+                            dispatch(actions.removeResult(item.username));
                           },
-                        ),
-                      )
-                  : 'Parado'}
-              </Text>
-              <Divider style={{marginTop: 10}} />
-            </Card.Content>
-            <Card.Actions>
-              <Button
-                mode="elevated"
-                textColor={colors.error}
-                buttonColor={colors.errorContainer}
-                onPress={async () => {
-                  dispatch(actions.removeResult(item.username));
-                }}>
-                <Icon from="octicons" name="trash" size={20} />
-              </Button>
-              <Button
-                mode="elevated"
-                textColor={colors.onPrimaryContainer}
-                buttonColor={
-                  item.running
-                    ? colors.primaryContainer
-                    : colors.surfaceDisabled
-                }
-                onPress={async () => {
-                  if (item.running) {
-                    dispatch(actions.saveResult({...item, running: false}));
-                    return;
+                        },
+                        {
+                          text: 'Cancelar',
+                          style: 'cancel',
+                        },
+                      ],
+                    );
+                  }}>
+                  <Icon from="octicons" name="trash" size={20} />
+                </Button>
+                <Button
+                  mode="elevated"
+                  textColor={colors.onPrimaryContainer}
+                  buttonColor={
+                    item.running
+                      ? colors.primaryContainer
+                      : colors.surfaceDisabled
                   }
-                  dispatch(actions.saveResult({...item, running: true}));
-                }}>
-                <Icon name="play-pause" size={20} />
-              </Button>
-            </Card.Actions>
-          </Card>
-        );
-      }}
-    />
+                  onPress={async () => {
+                    if (item.running) {
+                      dispatch(actions.saveResult({...item, running: false}));
+                      return;
+                    }
+                    dispatch(actions.saveResult({...item, running: true}));
+                  }}>
+                  <Icon name="play-pause" size={20} />
+                </Button>
+              </Card.Actions>
+            </Card>
+          );
+        }}
+      />
+    </Layout>
   );
 }

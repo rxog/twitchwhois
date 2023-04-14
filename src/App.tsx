@@ -10,24 +10,27 @@ import {
 } from 'react-native-paper';
 import {
   NavigationContainer,
-  NavigationContainerRef,
+  useNavigationContainerRef,
   DarkTheme as NavigationDarkTheme,
   DefaultTheme as NavigationDefaultTheme,
+  NavigationContainerRefWithCurrent,
 } from '@react-navigation/native';
 import {Dark, Light} from './pages/Styles/ThemeColors';
 import {useSelector} from 'react-redux';
 import {RootState} from '@/store';
 
+const LayoutDarkTheme = {...MD3DarkTheme, ...Dark};
+const LayoutLightTheme = {...MD3LightTheme, ...Light};
+
 const {LightTheme: NavLight, DarkTheme: NavDark} = adaptNavigationTheme({
   reactNavigationLight: NavigationDefaultTheme,
   reactNavigationDark: NavigationDarkTheme,
+  materialLight: LayoutLightTheme,
+  materialDark: LayoutDarkTheme,
 });
 
 function App(): JSX.Element {
-  const navigationRef =
-    React.useRef<NavigationContainerRef<Record<string, object | undefined>>>(
-      null,
-    );
+  const navigationRef = useNavigationContainerRef();
 
   React.useEffect(() => {
     notifee.onBackgroundEvent(async ({type, detail}) => {
@@ -38,7 +41,9 @@ function App(): JSX.Element {
         if (screen === 'go-twitch') {
           Linking.openURL('https://twitch.tv/');
         } else if (screen && navigationRef.current) {
-          navigationRef.current.navigate(screen);
+          (
+            navigationRef.current as NavigationContainerRefWithCurrent<any>
+          ).navigate(screen);
         }
 
         if (notification?.id && typeof notification.id === 'string') {
@@ -46,14 +51,12 @@ function App(): JSX.Element {
         }
       }
     });
-  }, []);
+  }, [navigationRef]);
 
   const dark = useSelector((state: RootState) => state.settings.dark);
 
-  const Theme = dark
-    ? {...MD3DarkTheme, ...Dark}
-    : {...MD3LightTheme, ...Light};
   const NavTheme = dark ? NavDark : NavLight;
+  const Theme = dark ? LayoutDarkTheme : LayoutLightTheme;
 
   return (
     <Provider theme={Theme}>

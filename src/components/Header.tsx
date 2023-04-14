@@ -17,6 +17,7 @@ type HeaderProps = {
 export default function Header({title}: HeaderProps) {
   const route = useRoute<RouteProp<any>>();
   const navigation = useNavigation<NavigationProp<any>>();
+
   const {colors} = useTheme();
   const style = StyleSheet.create({
     container: {

@@ -11,14 +11,14 @@ export interface TwitchAllData {
   created_at?: string;
   color?: string;
   channel?: Channel;
-  chatstate?: Chatstate[];
+  chatstate?: Chatstate;
   stream?: Stream;
   soundtrack?: null;
-  schedule?: null;
+  schedule?: Schedule;
   badges?: Badge[];
   emotes?: Emote[];
-  videos?: Video[];
-  clips?: Clip[];
+  videos?: boolean;
+  clips?: boolean;
 }
 
 export interface Badge {
@@ -114,6 +114,24 @@ export interface Stream {
   tag_ids?: any[];
   tags?: string[];
   is_mature?: boolean;
+}
+
+export interface Schedule {
+  segments?: Segment[];
+  broadcaster_id?: string;
+  broadcaster_name?: string;
+  broadcaster_login?: string;
+  vacation?: null;
+}
+
+export interface Segment {
+  id?: string;
+  start_time?: string;
+  end_time?: null;
+  title?: string;
+  canceled_until?: null;
+  category?: null;
+  is_recurring?: boolean;
 }
 
 export interface Video {

@@ -14,16 +14,14 @@ import {
   Divider,
   MD3Colors,
 } from 'react-native-paper';
+import Layout from '@/components/Layout';
 
 export default function SettingsPage() {
   const dispatch = useDispatch();
   const settings = useSelector((state: RootState) => state.settings);
 
   return (
-    <View
-      style={{
-        flex: 1,
-      }}>
+    <Layout title="definições">
       <List.Section>
         <List.Item
           title="Intervalo"
@@ -76,6 +74,6 @@ export default function SettingsPage() {
           Resetar
         </Button>
       </View>
-    </View>
+    </Layout>
   );
 }

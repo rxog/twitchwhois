@@ -16,8 +16,6 @@ import {
   Vibration,
   Linking,
   ToastAndroid,
-  Dimensions,
-  FlatList,
   Animated,
   ScrollView,
 } from 'react-native';
@@ -57,16 +55,16 @@ import Uptime from '@/utils/Uptime';
 import {TwitchAllData} from '@/utils/types/TwitchData';
 import BackgroundTask from '@/modules/BackgroundTask';
 import RunBackgroundTask from '@/modules/RunBackgroundTask';
-
-const WINDOW_WIDTH = Dimensions.get('window').width;
-const THUMBNAIL_WIDTH = WINDOW_WIDTH * 0.8 - 20;
-//const THUMBNAIL_HEIGHT = WINDOW_WIDTH / 2.4;
+import TwitchVideos from '@/components/TwitchVideoClips';
+import ThemeColors from './Styles/ThemeColors';
+import TwitchSchedule from '@/components/Schedule';
 
 export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
   const dispatch = useDispatch();
   const store = useStore<RootState>();
   const {settings} = store.getState();
   const [userdata, setUserData] = useState<TwitchAllData | null>(null);
+  const [streamUptime, setStreamUptime] = useState<string | null>(null);
   const [backgroundImage, setBackgroundImage] = useState<string | undefined>();
   const [isAvailable, setIsAvailable] = useState<number | null>(null);
   const [refreshing, setRefreshing] = useState(false);
@@ -99,6 +97,8 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
         if (data) {
           setUserData(data);
           if (data.stream && data.stream.thumbnail_url) {
+            const started = new Date(data.stream?.started_at as string);
+            setStreamUptime(Uptime(started));
             setBackgroundImage(
               data.stream.thumbnail_url.replace('{width}x{height}', '1280x720'),
             );
@@ -238,7 +238,10 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
         }}
         resizeMode="cover">
         <LinearGradient
-          colors={[colors.backdrop, colors.primaryContainer]}
+          colors={[
+            ThemeColors.Dark.colors.backdrop,
+            ThemeColors.Dark.colors.primaryContainer,
+          ]}
           style={{
             position: 'absolute',
             top: 0,
@@ -569,7 +572,7 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
                     ? 'Ao vivo há'
                     : 'Reprisando há'
                 }
-                description={Uptime(new Date(userdata.stream.started_at))}
+                description={streamUptime}
               />
             </>
           )}
@@ -608,7 +611,7 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
                   const uniqBadges = uniqBy(badges?.versions, 'title');
                   return uniqBadges.map(badge => (
                     <Tooltip
-                      enterTouchDelay={0}
+                      enterTouchDelay={100}
                       title={badge.title as string}
                       key={badge.id}>
                       <Image
@@ -651,7 +654,7 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
               description={() => {
                 const emotes = userdata.emotes?.map(emote => (
                   <Tooltip
-                    enterTouchDelay={0}
+                    enterTouchDelay={100}
                     title={emote.name as string}
                     key={emote.id}>
                     <Image
@@ -680,6 +683,72 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
           </>
         )}
         {userdata &&
+          userdata.chatstate &&
+          !!Object.entries(userdata.chatstate).some(([key, value]) => {
+            return !!value && key;
+          }) && (
+            <>
+              <Divider />
+              <List.Item
+                titleStyle={Fonts.RobotoRegular}
+                descriptionStyle={{
+                  flex: 1,
+                  flexDirection: 'row',
+                  flexWrap: 'wrap',
+                }}
+                title="Chat mode"
+                description={() => {
+                  const only_emotes = userdata.chatstate?.emote_mode && (
+                    <Chip>Somente emotes</Chip>
+                  );
+                  const only_follows = userdata.chatstate?.follower_mode && (
+                    <Chip>Somente seguidores</Chip>
+                  );
+                  const only_subs = userdata.chatstate?.subscriber_mode && (
+                    <Chip>Somente inscritos</Chip>
+                  );
+                  const slow_mode = userdata.chatstate?.slow_mode && (
+                    <Chip>Modo lento</Chip>
+                  );
+                  const unique_mode = userdata.chatstate?.unique_chat_mode && (
+                    <Chip>Sem repetições</Chip>
+                  );
+
+                  return (
+                    <View
+                      style={{
+                        marginVertical: 5,
+                        flexDirection: 'row',
+                        flexWrap: 'wrap',
+                        gap: 5,
+                      }}>
+                      {only_emotes}
+                      {only_follows}
+                      {only_subs}
+                      {slow_mode}
+                      {unique_mode}
+                    </View>
+                  );
+                }}
+              />
+            </>
+          )}
+        {userdata && userdata.chatstate && userdata.chatstate.emote_mode && (
+          <>
+            <Divider />
+            <List.Item
+              titleStyle={Fonts.RobotoRegular}
+              descriptionStyle={{
+                flex: 1,
+                flexDirection: 'row',
+                flexWrap: 'wrap',
+              }}
+              title="Somente emotes?"
+              description="Sim"
+            />
+          </>
+        )}
+        {userdata &&
           userdata.channel &&
           userdata.channel.tags &&
           !!userdata.channel.tags.length && (
@@ -700,164 +769,16 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
             </>
           )}
       </List.Section>
-      {userdata && userdata.clips && !!userdata.clips.length && (
-        <>
-          <Divider />
-          <Text
-            variant="headlineMedium"
-            style={[
-              Fonts.TwitchyTV,
-              {
-                marginTop: 20,
-                marginHorizontal: 10,
-              },
-            ]}>
-            clips
-          </Text>
-          <FlatList
-            data={userdata?.clips || []}
-            keyExtractor={clip => clip.id as string}
-            showsHorizontalScrollIndicator={false}
-            snapToOffsets={[...Array(userdata?.clips?.length)].map((_x, i) => {
-              const offset = i * (WINDOW_WIDTH * 0.8 - 40) + (i - 1) * 40;
-              return offset;
-            })}
-            horizontal
-            snapToAlignment="start"
-            scrollEventThrottle={16}
-            decelerationRate="fast"
-            renderItem={({item}) => {
-              const imageSource = item.thumbnail_url?.replace(
-                '%{width}x%{height}',
-                '480x272',
-              );
-              return (
-                <Card
-                  onPress={() => Linking.openURL(item?.url as string)}
-                  style={{
-                    marginHorizontal: 10,
-                    width: THUMBNAIL_WIDTH,
-                  }}>
-                  <Card.Cover
-                    source={{
-                      uri: imageSource,
-                    }}
-                  />
-                  <Card.Content>
-                    <Text
-                      numberOfLines={1}
-                      variant="bodyMedium"
-                      ellipsizeMode="tail"
-                      style={{marginTop: 10}}>
-                      {item.title}
-                    </Text>
-                    <Divider />
-                    <Text variant="bodySmall">
-                      {capitalize(
-                        formatDistanceToNow(
-                          Date.parse(item?.created_at as string),
-                          {
-                            locale: ptBR,
-                            addSuffix: true,
-                          },
-                        ),
-                      )}{' '}
-                      - {Number(item.view_count).toLocaleString('pt-BR')}{' '}
-                      visualizações
-                    </Text>
-                  </Card.Content>
-                </Card>
-              );
-            }}
-            style={{
-              marginVertical: 20,
-            }}
-          />
-        </>
+      {userdata &&
+        userdata.schedule &&
+        !!userdata.schedule.segments?.length && (
+          <TwitchSchedule data={userdata.schedule.segments} />
+        )}
+      {userdata && userdata.clips && (
+        <TwitchVideos type="clips" userId={userdata.id as string} />
       )}
-      {userdata && userdata.videos && !!userdata.videos.length && (
-        <>
-          <Divider />
-          <Text
-            variant="headlineMedium"
-            style={[
-              Fonts.TwitchyTV,
-              {
-                marginTop: 20,
-                marginHorizontal: 10,
-              },
-            ]}>
-            vídeos
-          </Text>
-          <FlatList
-            data={
-              userdata?.videos?.filter(video => video.viewable === 'public') ||
-              []
-            }
-            keyExtractor={video => video.id as string}
-            showsHorizontalScrollIndicator={false}
-            snapToOffsets={[...Array(userdata?.videos?.length)].map((_x, i) => {
-              const offset = i * (WINDOW_WIDTH * 0.8 - 40) + (i - 1) * 40;
-              return offset;
-            })}
-            horizontal
-            snapToAlignment="start"
-            scrollEventThrottle={16}
-            decelerationRate="fast"
-            renderItem={({item}) => {
-              const imageSource =
-                userdata?.stream?.id === item.stream_id
-                  ? userdata?.stream?.thumbnail_url?.replace(
-                      '{width}x{height}',
-                      '480x272',
-                    )
-                  : item.thumbnail_url?.replace(
-                      '%{width}x%{height}',
-                      '480x272',
-                    );
-              return (
-                <Card
-                  onPress={() => Linking.openURL(item?.url as string)}
-                  style={{
-                    marginHorizontal: 10,
-                    width: THUMBNAIL_WIDTH,
-                  }}>
-                  <Card.Cover
-                    source={{
-                      uri: imageSource,
-                    }}
-                  />
-                  <Card.Content>
-                    <Text
-                      numberOfLines={1}
-                      variant="bodyMedium"
-                      ellipsizeMode="tail"
-                      style={{marginTop: 10}}>
-                      {item.title}
-                    </Text>
-                    <Divider />
-                    <Text variant="bodySmall">
-                      {capitalize(
-                        formatDistanceToNow(
-                          Date.parse(item?.published_at as string),
-                          {
-                            locale: ptBR,
-                            addSuffix: true,
-                          },
-                        ),
-                      )}{' '}
-                      - {Number(item.view_count).toLocaleString('pt-BR')}{' '}
-                      visualizações
-                    </Text>
-                  </Card.Content>
-                </Card>
-              );
-            }}
-            style={{
-              marginVertical: 20,
-            }}
-          />
-        </>
+      {userdata && userdata.videos && (
+        <TwitchVideos type="videos" userId={userdata.id as string} />
       )}
     </ScrollView>
   );

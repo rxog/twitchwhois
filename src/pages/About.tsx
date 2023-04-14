@@ -1,16 +1,17 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import {Divider, List, Text, useTheme} from 'react-native-paper';
-import {View, ScrollView, StyleSheet, Pressable} from 'react-native';
+import {View, StyleSheet, Pressable} from 'react-native';
 import Fonts from './Styles/Fonts';
 import Icon from '@/components/Icon';
 import {Linking} from 'react-native';
+import Layout from '@/components/Layout';
 
 export default function AboutPage(): JSX.Element {
   const {fonts} = useTheme();
 
   return (
-    <ScrollView>
+    <Layout title="sobre">
       <List.AccordionGroup>
         <List.Accordion
           title="Motivação"
@@ -139,7 +140,7 @@ export default function AboutPage(): JSX.Element {
           </Pressable>
         </View>
       </View>
-    </ScrollView>
+    </Layout>
   );
 }
 

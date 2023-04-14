@@ -28,13 +28,12 @@ export default function SearchPage({
               fonts.headlineLarge,
               {
                 fontFamily: Fonts.TwitchyTV.fontFamily,
-                color: colors.onSurfaceVariant,
+                color: colors.primary,
               },
               {
-                textShadowColor: 'black',
-                textShadowRadius: 10,
+                textShadowColor: colors.shadow,
+                textShadowRadius: 2,
                 textShadowOffset: {height: 1, width: 1},
-                elevation: 2,
               },
             ]}>
             Twitch
@@ -45,7 +44,7 @@ export default function SearchPage({
             zIndex: 999,
             transform: [
               {
-                rotate: '-20deg',
+                rotate: '10deg',
               },
             ],
           }}>
@@ -53,15 +52,16 @@ export default function SearchPage({
             style={[
               fonts.headlineLarge,
               {
-                marginHorizontal: -5,
-                color: colors.secondary,
+                marginTop: 5,
+                marginLeft: -10,
+                marginRight: -5,
+                color: colors.primary,
                 fontFamily: Fonts.TalkComic.fontFamily,
               },
               {
-                textShadowColor: 'black',
-                textShadowRadius: 10,
+                textShadowColor: colors.shadow,
+                textShadowRadius: 2,
                 textShadowOffset: {height: 1, width: 1},
-                elevation: 2,
               },
             ]}>
             Who
@@ -73,13 +73,12 @@ export default function SearchPage({
               fonts.headlineLarge,
               {
                 fontFamily: Fonts.TwitchyTV.fontFamily,
-                color: colors.onSurfaceVariant,
+                color: colors.primary,
               },
               {
-                textShadowColor: 'black',
-                textShadowRadius: 10,
+                textShadowColor: colors.shadow,
+                textShadowRadius: 2,
                 textShadowOffset: {height: 1, width: 1},
-                elevation: 2,
               },
             ]}>
             Is

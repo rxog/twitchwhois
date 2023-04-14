@@ -87,3 +87,7 @@ export const Light = {
     backdrop: 'rgba(51, 47, 55, 0.4)',
   },
 };
+
+const ThemeColors = {Dark, Light};
+
+export default ThemeColors;
