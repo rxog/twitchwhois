@@ -1,12 +1,16 @@
 /* eslint-disable react-native/no-inline-styles */
-import Fonts from '@/pages/Styles/Fonts';
+import React from 'react';
+import {FlatList, View, Dimensions} from 'react-native';
+import {Divider, Text, Card} from 'react-native-paper';
 import {Segment} from '@/utils/types/TwitchData';
 import format from 'date-fns/format';
-import React from 'react';
-import {FlatList, View} from 'react-native';
-import {Divider, Text, Card} from 'react-native-paper';
+import Fonts from '@/pages/Styles/Fonts';
 
 export default function TwitchSchedule({data}: {data: Segment[]}) {
+  if (!Array.isArray(data)) {
+    return <></>;
+  }
+
   return (
     <View style={{marginBottom: 20}}>
       <Divider />
@@ -30,14 +34,15 @@ export default function TwitchSchedule({data}: {data: Segment[]}) {
             <Card
               style={{
                 margin: 10,
-                marginRight: 5,
+                marginHorizontal: 10,
+                maxWidth: Dimensions.get('window').width * 0.8 - 20,
               }}>
               <Card.Content>
                 {item.title && (
                   <Text variant="headlineSmall">{item.title}</Text>
                 )}
                 {item.category && (
-                  <Text variant="headlineSmall">- {item.category}</Text>
+                  <Text variant="bodyMedium">- {item.category?.name}</Text>
                 )}
                 {item.start_time && (
                   <Text>

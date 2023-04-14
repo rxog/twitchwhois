@@ -57,7 +57,7 @@ import BackgroundTask from '@/modules/BackgroundTask';
 import RunBackgroundTask from '@/modules/RunBackgroundTask';
 import TwitchVideos from '@/components/TwitchVideoClips';
 import ThemeColors from './Styles/ThemeColors';
-import TwitchSchedule from '@/components/Schedule';
+import TwitchSchedule from '@/components/TwitchSchedule';
 
 export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
   const dispatch = useDispatch();
@@ -337,21 +337,23 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
           </Text>
         )}
         {userdata && userdata.description && !!userdata.description.length && (
-          <Text
-            variant="bodyMedium"
-            numberOfLines={3}
-            style={[
-              {
-                color: MD3Colors.neutralVariant99,
-                textShadowOffset: {width: 1, height: 1},
-                textShadowRadius: 5,
-                textShadowColor: colors.shadow,
-                textAlign: 'center',
-                paddingHorizontal: 20,
-              },
-            ]}>
-            {userdata.description}
-          </Text>
+          <>
+            <Text
+              variant="bodyMedium"
+              numberOfLines={3}
+              style={[
+                {
+                  color: MD3Colors.neutralVariant99,
+                  textShadowOffset: {width: 1, height: 1},
+                  textShadowRadius: 5,
+                  textShadowColor: colors.shadow,
+                  textAlign: 'center',
+                  paddingHorizontal: 20,
+                },
+              ]}>
+              {userdata.description}
+            </Text>
+          </>
         )}
       </ImageBackground>
       <Card
@@ -684,9 +686,7 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
         )}
         {userdata &&
           userdata.chatstate &&
-          !!Object.entries(userdata.chatstate).some(([key, value]) => {
-            return !!value && key;
-          }) && (
+          Object.values(userdata.chatstate).some(value => value === true) && (
             <>
               <Divider />
               <List.Item
@@ -733,21 +733,6 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
               />
             </>
           )}
-        {userdata && userdata.chatstate && userdata.chatstate.emote_mode && (
-          <>
-            <Divider />
-            <List.Item
-              titleStyle={Fonts.RobotoRegular}
-              descriptionStyle={{
-                flex: 1,
-                flexDirection: 'row',
-                flexWrap: 'wrap',
-              }}
-              title="Somente emotes?"
-              description="Sim"
-            />
-          </>
-        )}
         {userdata &&
           userdata.channel &&
           userdata.channel.tags &&

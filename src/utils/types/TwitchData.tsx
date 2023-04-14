@@ -127,10 +127,13 @@ export interface Schedule {
 export interface Segment {
   id?: string;
   start_time?: string;
-  end_time?: null;
+  end_time?: string;
   title?: string;
-  canceled_until?: null;
-  category?: null;
+  canceled_until?: string;
+  category?: {
+    id: string;
+    name: string;
+  };
   is_recurring?: boolean;
 }
 
