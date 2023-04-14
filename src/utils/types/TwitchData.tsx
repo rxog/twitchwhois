@@ -121,7 +121,12 @@ export interface Schedule {
   broadcaster_id?: string;
   broadcaster_name?: string;
   broadcaster_login?: string;
-  vacation?: null;
+  vacation?: Vacation;
+}
+
+export interface Vacation {
+  start_time: string;
+  end_time: string;
 }
 
 export interface Segment {

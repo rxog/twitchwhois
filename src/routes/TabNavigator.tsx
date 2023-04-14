@@ -52,7 +52,7 @@ export default function TabNavigator() {
         name="monitor"
         component={MonitorPage}
         options={{
-          title: 'Monitoramento',
+          title: 'Monitor',
           tabBarIcon: props => (
             <Icon from="materialCommunity" name="list-status" {...props} />
           ),

@@ -18,11 +18,11 @@ import {
   ToastAndroid,
   Animated,
   ScrollView,
+  Dimensions,
 } from 'react-native';
 import Twitch from '@/utils/TwitchAPI';
 import ptBR from 'date-fns/locale/pt-BR';
 import format from 'date-fns/format';
-import formatDistanceToNow from 'date-fns/formatDistanceToNow';
 import Icon from '@/components/Icon';
 import {actions} from '@/store/reducers/results';
 import {useRoute} from '@react-navigation/native';
@@ -51,13 +51,15 @@ import ResultBox from '@/components/ResultBox';
 import LinearGradient from 'react-native-linear-gradient';
 import Fonts from './Styles/Fonts';
 import {capitalize, uniqBy} from 'lodash';
-import Uptime from '@/utils/Uptime';
 import {TwitchAllData} from '@/utils/types/TwitchData';
 import BackgroundTask from '@/modules/BackgroundTask';
 import RunBackgroundTask from '@/modules/RunBackgroundTask';
 import TwitchVideos from '@/components/TwitchVideoClips';
 import ThemeColors from './Styles/ThemeColors';
 import TwitchSchedule from '@/components/TwitchSchedule';
+import formatDuration from 'date-fns/formatDuration';
+import intervalToDuration from 'date-fns/intervalToDuration';
+import formatDistanceToNowStrict from 'date-fns/formatDistanceToNowStrict';
 
 export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
   const dispatch = useDispatch();
@@ -98,7 +100,16 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
           setUserData(data);
           if (data.stream && data.stream.thumbnail_url) {
             const started = new Date(data.stream?.started_at as string);
-            setStreamUptime(Uptime(started));
+            const duration = intervalToDuration({
+              start: started,
+              end: Date.now(),
+            });
+
+            setStreamUptime(
+              formatDuration(duration, {
+                locale: ptBR,
+              }),
+            );
             setBackgroundImage(
               data.stream.thumbnail_url.replace('{width}x{height}', '1280x720'),
             );
@@ -365,12 +376,21 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
           style={{
             flexDirection: 'row',
             justifyContent: 'space-between',
+            alignItems: 'center',
           }}>
-          <View
+          <Animated.View
             style={{
               gap: 8,
               flex: 1,
               flexDirection: 'row',
+              transform: [
+                {
+                  translateX: animatedBackButton.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [40, 0],
+                  }),
+                },
+              ],
             }}>
             <Button
               mode="contained-tonal"
@@ -388,13 +408,21 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
                 Inscrever-se
               </Button>
             )}
-          </View>
+          </Animated.View>
           <Animated.View
             style={[
               {
+                position: 'absolute',
+                left: 0,
                 borderRadius: 100,
                 overflow: 'hidden',
                 transform: [
+                  {
+                    translateX: animatedBackButton.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [10, Dimensions.get('window').width - 50],
+                    }),
+                  },
                   {
                     rotate: animatedBackButton.interpolate({
                       inputRange: [0, 1],
@@ -494,8 +522,9 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
               descriptionStyle={Fonts.RobotoLight}
               title="Idade"
               description={capitalize(
-                formatDistanceToNow(Date.parse(userdata.created_at), {
+                formatDistanceToNowStrict(Date.parse(userdata.created_at), {
                   locale: ptBR,
+                  roundingMethod: 'floor',
                 }),
               )}
             />
@@ -598,7 +627,7 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
               titleStyle={Fonts.RobotoRegular}
               descriptionStyle={Fonts.RobotoLight}
               title="Público"
-              description={userdata.stream.is_mature ? 'Adulto' : 'Livre'}
+              description={userdata.stream.is_mature ? '+18' : 'Livre'}
             />
           </>
         )}
@@ -662,8 +691,8 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
                     <Image
                       source={{
                         uri: emote.images?.url_2x,
-                        width: 36,
-                        height: 36,
+                        width: 48,
+                        height: 48,
                       }}
                     />
                   </Tooltip>
@@ -696,7 +725,7 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
                   flexDirection: 'row',
                   flexWrap: 'wrap',
                 }}
-                title="Chat mode"
+                title="Chat"
                 description={() => {
                   const only_emotes = userdata.chatstate?.emote_mode && (
                     <Chip>Somente emotes</Chip>
@@ -757,7 +786,7 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
       {userdata &&
         userdata.schedule &&
         !!userdata.schedule.segments?.length && (
-          <TwitchSchedule data={userdata.schedule.segments} />
+          <TwitchSchedule data={userdata.schedule} />
         )}
       {userdata && userdata.clips && (
         <TwitchVideos type="clips" userId={userdata.id as string} />
