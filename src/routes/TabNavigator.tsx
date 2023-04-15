@@ -11,6 +11,7 @@ import Icon from '@/components/Icon';
 import TabButton from '@/components/TabButton';
 import {useSelector} from 'react-redux';
 import {RootState} from '@/store';
+import Header from '@/components/Header';
 
 const Tab = createBottomTabNavigator();
 
@@ -21,7 +22,7 @@ export default function TabNavigator() {
       backBehavior="history"
       initialRouteName={tasks > 0 ? 'monitor' : 'search'}
       screenOptions={{
-        headerShown: false,
+        headerShown: true,
         tabBarHideOnKeyboard: true,
         tabBarLabel: ({focused, color, children}) => {
           return (
@@ -36,6 +37,7 @@ export default function TabNavigator() {
           top: 6,
           left: 12,
         },
+        header: props => <Header {...props} />,
       }}>
       <Tab.Screen
         name="search"

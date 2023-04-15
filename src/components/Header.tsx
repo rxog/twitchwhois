@@ -1,36 +1,35 @@
 import React from 'react';
 import {View, StyleSheet} from 'react-native';
 import {Text, useTheme, TouchableRipple} from 'react-native-paper';
-import {
-  NavigationProp,
-  RouteProp,
-  useNavigation,
-  useRoute,
-} from '@react-navigation/native';
 import Fonts from '@/pages/Styles/Fonts';
 import Icon from './Icon';
+import {BottomTabHeaderProps} from '@react-navigation/bottom-tabs';
+import {NativeStackHeaderProps} from '@react-navigation/native-stack';
 
-type HeaderProps = {
-  title?: string;
-};
-
-export default function Header({title}: HeaderProps) {
-  const route = useRoute<RouteProp<any>>();
-  const navigation = useNavigation<NavigationProp<any>>();
+export default function Header(
+  props: NativeStackHeaderProps | BottomTabHeaderProps,
+) {
+  const route = props.route;
+  const options = props.options;
+  const navigation = props.navigation;
 
   const {colors} = useTheme();
   const style = StyleSheet.create({
     container: {
-      flex: 1,
+      marginBottom: 50,
+    },
+    content: {
+      width: '100%',
+      height: 50,
       alignItems: 'center',
       flexDirection: 'row',
-      backgroundColor: colors.primaryContainer,
-      padding: 5,
-      height: 64,
+      position: 'absolute',
+      padding: 10,
     },
     title: {
       textAlign: 'center',
       fontFamily: Fonts.TwitchyTV.fontFamily,
+      lineHeight: 28,
       color: colors.onPrimaryContainer,
     },
     view: {
@@ -50,21 +49,25 @@ export default function Header({title}: HeaderProps) {
 
   return (
     <View style={style.container}>
-      <View style={style.view}>
-        <Text variant="headlineSmall" style={style.title}>
-          {title || route.name}
-        </Text>
-      </View>
-      <View style={style.backView}>
-        <TouchableRipple
-          style={style.backButton}
-          onPress={() => {
-            navigation.canGoBack() && navigation.goBack();
-          }}>
-          <Text>
-            <Icon from="materialIcons" name="arrow-back" size={20} />
+      <View style={style.content}>
+        <View style={style.view}>
+          <Text variant="headlineSmall" numberOfLines={1} style={style.title}>
+            {options?.title || route?.name}
           </Text>
-        </TouchableRipple>
+        </View>
+        {navigation?.canGoBack() && (
+          <View style={style.backView}>
+            <TouchableRipple
+              style={style.backButton}
+              onPress={() => {
+                navigation?.goBack();
+              }}>
+              <Text>
+                <Icon from="materialIcons" name="arrow-back" size={20} />
+              </Text>
+            </TouchableRipple>
+          </View>
+        )}
       </View>
     </View>
   );

@@ -35,7 +35,6 @@ export default function TwitchVideos({
     next: null,
     prev: null,
   });
-  const [listWidth, setListWidth] = useState(0);
   const [_scrollOffset, setScrollOffset] = useState(0);
   const listRef = useRef<FlatList<any>>(null);
 
@@ -74,16 +73,8 @@ export default function TwitchVideos({
     }
   }, [isLoading, endReached]);
 
-  useEffect(() => {
-    if (listWidth > 0) {
-      const threshold = 300;
-      const thresholdPixels = listWidth - threshold;
-      listRef.current?.setNativeProps({onEndReachedThreshold: thresholdPixels});
-    }
-  }, [listWidth]);
-
   return (
-    <>
+    <View>
       <Divider />
       <Text
         variant="headlineMedium"
@@ -96,80 +87,77 @@ export default function TwitchVideos({
         ]}>
         {title}
       </Text>
-      <View
-        onLayout={event => {
-          const {width} = event.nativeEvent.layout;
-          setListWidth(width);
-        }}>
-        <FlatList
-          ref={listRef}
-          data={uniqBy(data, 'id')}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          snapToOffsets={[...Array(data.length)].map((_x, i) => {
-            const offset = i * (WINDOW_WIDTH * 0.8 - 40) + (i - 1) * 40;
-            return offset;
-          })}
-          onScroll={event => {
-            const {contentOffset} = event.nativeEvent;
-            setScrollOffset(contentOffset.x);
-          }}
-          keyExtractor={item => `${item.id}-${Date.now()}`}
-          snapToAlignment="start"
-          scrollEventThrottle={16}
-          decelerationRate="fast"
-          onEndReached={handleOnEndReached}
-          renderItem={({item}) => {
-            const isLive = `https://static-cdn.jtvnw.net/previews-ttv/live_user_${item.user_login}-480x272.jpg`;
-            const thumb404 = String(item.thumbnail_url).includes(
-              '_404/404_processing_',
-            );
-            const imageSource = thumb404
-              ? isLive
-              : item.thumbnail_url.replace('%{width}x%{height}', '480x272');
-            return (
-              <Card
-                onPress={() => Linking.openURL(item.url)}
-                style={{
-                  marginHorizontal: 10,
-                  width: THUMBNAIL_WIDTH,
-                }}>
-                <Card.Cover
-                  source={{
-                    uri: imageSource,
-                  }}
-                />
-                <Card.Content>
-                  <Text
-                    numberOfLines={1}
-                    variant="bodyMedium"
-                    ellipsizeMode="tail"
-                    style={{marginTop: 10}}>
-                    {item.title}
-                  </Text>
-                  <Divider />
-                  <Text variant="bodySmall">
-                    {capitalize(
-                      formatDistanceToNow(
-                        Date.parse(item.published_at || item.created_at),
-                        {
-                          locale: ptBR,
-                          addSuffix: true,
-                        },
-                      ),
-                    )}{' '}
-                    - {Number(item.view_count).toLocaleString('pt-BR')}{' '}
-                    visualizações
-                  </Text>
-                </Card.Content>
-              </Card>
-            );
-          }}
-          style={{
-            marginVertical: 20,
-          }}
-        />
-      </View>
-    </>
+      <FlatList
+        ref={listRef}
+        data={uniqBy(data, 'id')}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        snapToOffsets={[...Array(data.length)].map((_x, i) => {
+          const offset = i * (WINDOW_WIDTH * 0.8 - 40) + (i - 1) * 40;
+          return offset;
+        })}
+        onScroll={event => {
+          const {contentOffset} = event.nativeEvent;
+          setScrollOffset(contentOffset.x);
+        }}
+        keyExtractor={item => `${item.id}-${Date.now()}`}
+        snapToAlignment="start"
+        scrollEventThrottle={16}
+        decelerationRate="fast"
+        onEndReached={handleOnEndReached}
+        onEndReachedThreshold={0.25}
+        initialNumToRender={3}
+        maxToRenderPerBatch={3}
+        renderItem={({item}) => {
+          const isLive = `https://static-cdn.jtvnw.net/previews-ttv/live_user_${item.user_login}-480x272.jpg`;
+          const thumb404 = String(item.thumbnail_url).includes(
+            '_404/404_processing_',
+          );
+          const imageSource = thumb404
+            ? isLive
+            : item.thumbnail_url.replace('%{width}x%{height}', '480x272');
+          return (
+            <Card
+              onPress={() => Linking.openURL(item.url)}
+              style={{
+                marginHorizontal: 10,
+                width: THUMBNAIL_WIDTH,
+              }}>
+              <Card.Cover
+                source={{
+                  uri: imageSource,
+                }}
+              />
+              <Card.Content>
+                <Text
+                  numberOfLines={1}
+                  variant="bodyMedium"
+                  ellipsizeMode="tail"
+                  style={{marginTop: 10}}>
+                  {item.title}
+                </Text>
+                <Divider />
+                <Text variant="bodySmall">
+                  {capitalize(
+                    formatDistanceToNow(
+                      Date.parse(item.published_at || item.created_at),
+                      {
+                        locale: ptBR,
+                        addSuffix: true,
+                      },
+                    ),
+                  )}{' '}
+                  - {Number(item.view_count).toLocaleString('pt-BR')}{' '}
+                  visualizações
+                </Text>
+              </Card.Content>
+            </Card>
+          );
+        }}
+        style={{
+          marginVertical: 20,
+        }}
+      />
+    </View>
   );
 }

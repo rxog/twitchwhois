@@ -1,7 +1,7 @@
 import React from 'react';
 import {Linking, StatusBar} from 'react-native';
 import notifee, {EventType} from '@notifee/react-native';
-import Navigation from './routes';
+import Navigation, {navigationRef} from './routes';
 import {
   Provider,
   MD3DarkTheme,
@@ -10,7 +10,6 @@ import {
 } from 'react-native-paper';
 import {
   NavigationContainer,
-  useNavigationContainerRef,
   DarkTheme as NavigationDarkTheme,
   DefaultTheme as NavigationDefaultTheme,
   NavigationContainerRefWithCurrent,
@@ -30,8 +29,6 @@ const {LightTheme: NavLight, DarkTheme: NavDark} = adaptNavigationTheme({
 });
 
 function App(): JSX.Element {
-  const navigationRef = useNavigationContainerRef();
-
   React.useEffect(() => {
     notifee.onBackgroundEvent(async ({type, detail}) => {
       const {notification, pressAction} = detail;
@@ -40,10 +37,10 @@ function App(): JSX.Element {
 
         if (screen === 'go-twitch') {
           Linking.openURL('https://twitch.tv/');
-        } else if (screen && navigationRef.current) {
-          (
-            navigationRef.current as NavigationContainerRefWithCurrent<any>
-          ).navigate(screen);
+        } else if (screen && navigationRef.isReady()) {
+          (navigationRef as NavigationContainerRefWithCurrent<any>).navigate(
+            screen,
+          );
         }
 
         if (notification?.id && typeof notification.id === 'string') {
@@ -51,7 +48,7 @@ function App(): JSX.Element {
         }
       }
     });
-  }, [navigationRef]);
+  }, []);
 
   const dark = useSelector((state: RootState) => state.settings.dark);
 

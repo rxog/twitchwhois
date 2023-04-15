@@ -8,8 +8,11 @@ import Fonts from '@/pages/Styles/Fonts';
 import Icon from './Icon';
 import formatDistanceToNowStrict from 'date-fns/formatDistanceToNowStrict';
 import ptBR from 'date-fns/locale/pt-BR';
+import {useTheme} from 'react-native-paper';
 
 function Segments({data}: {data: Segment[]}) {
+  const {colors} = useTheme();
+
   return (
     <FlatList
       data={data}
@@ -24,9 +27,17 @@ function Segments({data}: {data: Segment[]}) {
               maxWidth: Dimensions.get('window').width * 0.8 - 20,
             }}>
             <Card.Content>
-              {item.title && <Text variant="headlineSmall">{item.title}</Text>}
+              {item.title && (
+                <Text variant="headlineSmall" numberOfLines={2}>
+                  {item.title}
+                </Text>
+              )}
               {item.category && (
-                <Text variant="bodyMedium">- {item.category?.name}</Text>
+                <Text
+                  variant="bodyMedium"
+                  style={{color: colors.onSurfaceVariant}}>
+                  - {item.category?.name}
+                </Text>
               )}
               {item.start_time && (
                 <Text>

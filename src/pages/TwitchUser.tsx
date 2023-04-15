@@ -18,7 +18,6 @@ import {
   ToastAndroid,
   Animated,
   ScrollView,
-  Dimensions,
 } from 'react-native';
 import Twitch from '@/utils/TwitchAPI';
 import ptBR from 'date-fns/locale/pt-BR';
@@ -80,18 +79,18 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
   const [scrollY, setScrollY] = useState(0);
   const scrollViewRef = useRef<ScrollView>(null);
   const animatedBackButton = useRef(new Animated.Value(0)).current;
-  const backButtonPosition = useCallback(
-    () => (scrollY > backgroundSize.height ? 'top' : 'screen'),
+  const canBackToTop = useCallback(
+    () => scrollY > backgroundSize.height,
     [scrollY, backgroundSize.height],
   );
 
   useMemo(() => {
     Animated.timing(animatedBackButton, {
-      toValue: backButtonPosition() === 'screen' ? 0 : 1,
+      toValue: canBackToTop() ? 1 : 0,
       duration: 100,
       useNativeDriver: true,
     }).start();
-  }, [backButtonPosition()]);
+  }, [canBackToTop()]);
 
   const fetchUserData = () => {
     Twitch.getAllData(username)
@@ -108,6 +107,8 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
             setStreamUptime(
               formatDuration(duration, {
                 locale: ptBR,
+                delimiter: ' e ',
+                format: ['hours', 'minutes'],
               }),
             );
             setBackgroundImage(
@@ -290,10 +291,7 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
                   top: 10,
                   color: '#fff',
                   backgroundColor: '#f44336',
-                }}
-                onPress={() =>
-                  Linking.openURL(`https://www.twitch.tv/${username}`)
-                }>
+                }}>
                 {userdata.stream.type === 'live' ? 'AO VIVO' : 'RERUN'}
               </Badge>
             )}
@@ -309,7 +307,7 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
             style={[
               fonts.displayMedium,
               {
-                color: MD3Colors.tertiary99,
+                color: MD3Colors.tertiary95,
                 fontWeight: 'bold',
                 textShadowOffset: {width: 2, height: 2},
                 textShadowRadius: 5,
@@ -369,8 +367,8 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
       </ImageBackground>
       <Card
         mode="elevated"
-        style={{
-          marginTop: -10,
+        contentStyle={{
+          backgroundColor: colors.surface,
         }}>
         <Card.Content
           style={{
@@ -378,19 +376,11 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
             justifyContent: 'space-between',
             alignItems: 'center',
           }}>
-          <Animated.View
+          <View
             style={{
               gap: 8,
               flex: 1,
               flexDirection: 'row',
-              transform: [
-                {
-                  translateX: animatedBackButton.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [40, 0],
-                  }),
-                },
-              ],
             }}>
             <Button
               mode="contained-tonal"
@@ -408,21 +398,19 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
                 Inscrever-se
               </Button>
             )}
-          </Animated.View>
+          </View>
           <Animated.View
             style={[
               {
                 position: 'absolute',
-                left: 0,
+                right: 10,
                 borderRadius: 100,
                 overflow: 'hidden',
+                opacity: animatedBackButton.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0, 1],
+                }),
                 transform: [
-                  {
-                    translateX: animatedBackButton.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: [10, Dimensions.get('window').width - 50],
-                    }),
-                  },
                   {
                     rotate: animatedBackButton.interpolate({
                       inputRange: [0, 1],
@@ -437,12 +425,10 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
                 padding: 10,
               }}
               onPress={() => {
-                if (backButtonPosition() === 'top') {
+                if (canBackToTop()) {
                   scrollViewRef.current?.scrollTo({y: 0, x: 0, animated: true});
                   return;
                 }
-
-                navigation.canGoBack() && navigation.goBack();
               }}>
               <Text>
                 <Icon from="materialIcons" name="arrow-back" size={20} />
@@ -532,15 +518,11 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
             <List.Item
               titleStyle={Fonts.RobotoRegular}
               descriptionStyle={Fonts.RobotoLight}
-              title="Criada em"
+              title="Criação"
               description={capitalize(
-                format(
-                  Date.parse(userdata.created_at),
-                  'EEE, dd/MM/yyyy HH:mm:ss',
-                  {
-                    locale: ptBR,
-                  },
-                ),
+                format(Date.parse(userdata.created_at), 'EEE, PPPp', {
+                  locale: ptBR,
+                }),
               )}
             />
           </>

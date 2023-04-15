@@ -6,7 +6,6 @@ import {useSelector} from 'react-redux';
 import {Text, useTheme} from 'react-native-paper';
 import Icon from '@/components/Icon';
 import {sortBy} from 'lodash';
-import Layout from '@/components/Layout';
 import MonitorItem from '@/components/MonitorItem';
 
 export default function MonitorPage() {
@@ -36,34 +35,27 @@ export default function MonitorPage() {
   });
 
   return (
-    <Layout title="monitor">
-      <FlatList
-        data={results}
-        keyExtractor={item => item.username}
-        ListHeaderComponent={() => (
-          <View style={style.headerComponent}>
-            <View style={style.Available}>
-              <Text>Disponível: </Text>
-              <Icon
-                from="materialIcons"
-                name="mood"
-                size={30}
-                color="#66bb6a"
-              />
-            </View>
-            <View style={style.NotAvailable}>
-              <Text>Indisponível: </Text>
-              <Icon
-                from="materialIcons"
-                name="mood-bad"
-                color="#f44336"
-                size={30}
-              />
-            </View>
+    <FlatList
+      data={results}
+      keyExtractor={item => item.username}
+      ListHeaderComponent={() => (
+        <View style={style.headerComponent}>
+          <View style={style.Available}>
+            <Text>Disponível: </Text>
+            <Icon from="materialIcons" name="mood" size={30} color="#66bb6a" />
           </View>
-        )}
-        renderItem={({item}) => <MonitorItem item={item} />}
-      />
-    </Layout>
+          <View style={style.NotAvailable}>
+            <Text>Indisponível: </Text>
+            <Icon
+              from="materialIcons"
+              name="mood-bad"
+              color="#f44336"
+              size={30}
+            />
+          </View>
+        </View>
+      )}
+      renderItem={({item}) => <MonitorItem item={item} />}
+    />
   );
 }

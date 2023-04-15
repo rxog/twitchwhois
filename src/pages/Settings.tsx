@@ -1,7 +1,7 @@
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import {View} from 'react-native';
+import {ScrollView, View} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import Slider from '@react-native-community/slider';
 import {actions} from '@/store/reducers/settings';
@@ -14,14 +14,13 @@ import {
   Divider,
   MD3Colors,
 } from 'react-native-paper';
-import Layout from '@/components/Layout';
 
 export default function SettingsPage() {
   const dispatch = useDispatch();
   const settings = useSelector((state: RootState) => state.settings);
 
   return (
-    <Layout title="definições">
+    <ScrollView>
       <List.Section>
         <List.Item
           title="Intervalo"
@@ -74,6 +73,6 @@ export default function SettingsPage() {
           Resetar
         </Button>
       </View>
-    </Layout>
+    </ScrollView>
   );
 }
