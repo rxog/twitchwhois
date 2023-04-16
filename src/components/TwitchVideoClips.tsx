@@ -105,9 +105,9 @@ export default function TwitchVideos({
         scrollEventThrottle={16}
         decelerationRate="fast"
         onEndReached={handleOnEndReached}
-        onEndReachedThreshold={0.25}
-        initialNumToRender={3}
+        onEndReachedThreshold={0.5}
         maxToRenderPerBatch={3}
+        initialNumToRender={3}
         renderItem={({item}) => {
           const isLive = `https://static-cdn.jtvnw.net/previews-ttv/live_user_${item.user_login}-480x272.jpg`;
           const thumb404 = String(item.thumbnail_url).includes(

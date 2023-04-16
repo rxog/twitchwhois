@@ -62,84 +62,87 @@ export default function TrendingPage(): JSX.Element {
       data={games}
       keyExtractor={game => game.id as string}
       renderItem={({item}) => (
-        <ImageBackground
-          source={{
-            uri: item.box_art_url?.replace('{width}x{height}', '350x500'),
-          }}
-          style={{
-            marginHorizontal: 10,
-            marginBottom: 10,
-            borderRadius: 10,
-            overflow: 'hidden',
-          }}
-          resizeMode="cover">
-          <View
-            style={{
-              backgroundColor: ThemeColors.Dark.colors.primaryContainer,
-              opacity: 0.66,
-              position: 'absolute',
-              top: 0,
-              bottom: 0,
-              left: 0,
-              right: 0,
+        <>
+          <Divider style={{marginBottom: 10}} />
+          <ImageBackground
+            source={{
+              uri: item.box_art_url?.replace('{width}x{height}', '350x500'),
             }}
-          />
-          <View style={{flex: 1, padding: 10}}>
-            <Title
-              style={[
-                {
-                  textAlign: 'center',
-                  textShadowColor: ThemeColors.Dark.colors.primaryContainer,
-                  textShadowOffset: {height: 1, width: 1},
-                  textShadowRadius: 10,
-                  color: ThemeColors.Dark.colors.onPrimaryContainer,
-                },
-                Fonts.TwitchyTV,
-              ]}>
-              {item.name}
-            </Title>
-            <Divider
+            style={{
+              marginHorizontal: 10,
+              marginBottom: 10,
+              borderRadius: 10,
+              overflow: 'hidden',
+            }}
+            resizeMode="cover">
+            <View
               style={{
-                backgroundColor: ThemeColors.Dark.colors.primary,
+                backgroundColor: ThemeColors.Dark.colors.primaryContainer,
+                opacity: 0.66,
+                position: 'absolute',
+                top: 0,
+                bottom: 0,
+                left: 0,
+                right: 0,
               }}
             />
-            {item.streams?.map(stream => (
-              <View key={stream.id} style={{marginVertical: 5}}>
-                <Button
-                  buttonColor={ThemeColors.Dark.colors.inversePrimary}
-                  textColor={ThemeColors.Dark.colors.onPrimaryContainer}
-                  mode="contained"
-                  onPress={() => {
-                    navigation.navigate('twitchuser', {
-                      username: stream.user_login as string,
-                    });
-                  }}>
-                  @{stream.user_login}
-                </Button>
-                <View
-                  style={{
-                    paddingHorizontal: 10,
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                  }}>
-                  <Text
-                    style={{
-                      color: ThemeColors.Dark.colors.primary,
+            <View style={{flex: 1, padding: 10}}>
+              <Title
+                style={[
+                  {
+                    textAlign: 'center',
+                    textShadowColor: ThemeColors.Dark.colors.primaryContainer,
+                    textShadowOffset: {height: 1, width: 1},
+                    textShadowRadius: 10,
+                    color: ThemeColors.Dark.colors.onPrimaryContainer,
+                  },
+                  Fonts.TwitchyTV,
+                ]}>
+                {item.name}
+              </Title>
+              <Divider
+                style={{
+                  backgroundColor: ThemeColors.Dark.colors.primary,
+                }}
+              />
+              {item.streams?.map(stream => (
+                <View key={stream.id} style={{marginVertical: 5}}>
+                  <Button
+                    buttonColor={ThemeColors.Dark.colors.inversePrimary}
+                    textColor={ThemeColors.Dark.colors.onPrimaryContainer}
+                    mode="contained"
+                    onPress={() => {
+                      navigation.navigate('twitchuser', {
+                        username: stream.user_login as string,
+                      });
                     }}>
-                    <Icon from="ionicons" name="eye" /> {stream.viewer_count}{' '}
-                    espectadores
-                  </Text>
-                  <Text
+                    @{stream.user_login}
+                  </Button>
+                  <View
                     style={{
-                      color: ThemeColors.Dark.colors.primary,
+                      paddingHorizontal: 10,
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
                     }}>
-                    {stream.is_mature ? '+18' : 'Livre'}
-                  </Text>
+                    <Text
+                      style={{
+                        color: ThemeColors.Dark.colors.primary,
+                      }}>
+                      <Icon from="ionicons" name="eye" /> {stream.viewer_count}{' '}
+                      espectadores
+                    </Text>
+                    <Text
+                      style={{
+                        color: ThemeColors.Dark.colors.primary,
+                      }}>
+                      {stream.is_mature ? '+18' : 'Livre'}
+                    </Text>
+                  </View>
                 </View>
-              </View>
-            ))}
-          </View>
-        </ImageBackground>
+              ))}
+            </View>
+          </ImageBackground>
+        </>
       )}
     />
   );

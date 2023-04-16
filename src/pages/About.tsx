@@ -11,6 +11,7 @@ export default function AboutPage(): JSX.Element {
 
   return (
     <ScrollView>
+      <Divider />
       <List.AccordionGroup>
         <List.Accordion
           title="Motivação"

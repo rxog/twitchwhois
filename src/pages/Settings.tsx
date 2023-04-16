@@ -21,6 +21,7 @@ export default function SettingsPage() {
 
   return (
     <ScrollView>
+      <Divider />
       <List.Section>
         <List.Item
           title="Intervalo"

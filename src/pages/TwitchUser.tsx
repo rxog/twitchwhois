@@ -33,7 +33,6 @@ import ISO6391 from 'iso-639-1';
 import {
   Avatar,
   Badge,
-  Card,
   Button,
   useTheme,
   List,
@@ -87,7 +86,7 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
   useMemo(() => {
     Animated.timing(animatedBackButton, {
       toValue: canBackToTop() ? 1 : 0,
-      duration: 100,
+      duration: 300,
       useNativeDriver: true,
     }).start();
   }, [canBackToTop()]);
@@ -216,170 +215,170 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
   }
 
   return (
-    <ScrollView
-      ref={scrollViewRef}
-      scrollEventThrottle={16}
-      onScroll={({nativeEvent: {contentOffset}}) => {
-        setScrollY(contentOffset.y);
-      }}
-      stickyHeaderIndices={[1]}
-      refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={() => {
-            setRefreshing(true);
-            fetchUserData();
+    <React.Fragment>
+      <ScrollView
+        ref={scrollViewRef}
+        scrollEventThrottle={16}
+        onScroll={({nativeEvent: {contentOffset}}) => {
+          setScrollY(contentOffset.y);
+        }}
+        stickyHeaderIndices={[1]}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={() => {
+              setRefreshing(true);
+              fetchUserData();
+            }}
+          />
+        }>
+        <ImageBackground
+          onLayout={event => {
+            const {width, height} = event.nativeEvent.layout;
+            setBackgroundSize({width, height});
           }}
-        />
-      }>
-      <ImageBackground
-        onLayout={event => {
-          const {width, height} = event.nativeEvent.layout;
-          setBackgroundSize({width, height});
-        }}
-        source={{
-          uri: backgroundImage,
-        }}
-        style={{
-          flex: 1,
-          padding: 20,
-          overflow: 'hidden',
-          alignItems: 'center',
-          justifyContent: 'center',
-          paddingBottom: 25,
-        }}
-        resizeMode="cover">
-        <LinearGradient
-          colors={[
-            ThemeColors.Dark.colors.backdrop,
-            ThemeColors.Dark.colors.primaryContainer,
-          ]}
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
+          source={{
+            uri: backgroundImage,
           }}
-        />
-        <View>
-          {userdata && userdata.hasOwnProperty('profile_image_url') && (
-            <View
-              style={{
-                borderWidth: 6,
-                borderColor: userdata.color?.length
-                  ? userdata.color
-                  : 'transparent',
-                borderRadius: 100,
-              }}>
-              <Avatar.Image
-                size={150}
-                style={{backgroundColor: userdata.color}}
-                source={{uri: userdata.profile_image_url}}
-              />
-            </View>
-          )}
-          {userdata &&
-            userdata.stream &&
-            userdata.stream.type &&
-            !!userdata.stream.type.length && (
-              <Badge
-                size={30}
-                style={{
-                  position: 'absolute',
-                  right: -10,
-                  top: 10,
-                  color: '#fff',
-                  backgroundColor: '#f44336',
-                }}>
-                {userdata.stream.type === 'live' ? 'AO VIVO' : 'RERUN'}
-              </Badge>
-            )}
-        </View>
-        <View
           style={{
-            flexDirection: 'row',
+            flex: 1,
+            padding: 20,
+            overflow: 'hidden',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: 2,
-          }}>
-          <Text
-            style={[
-              fonts.displayMedium,
-              {
-                color: MD3Colors.tertiary95,
-                fontWeight: 'bold',
-                textShadowOffset: {width: 2, height: 2},
-                textShadowRadius: 5,
-                textShadowColor: colors.shadow,
-              },
-            ]}>
-            {userdata?.display_name}
-          </Text>
-          {userdata &&
-            userdata.broadcaster_type &&
-            userdata.broadcaster_type === 'partner' && (
-              <Icon
+            paddingBottom: 25,
+          }}
+          resizeMode="cover">
+          <LinearGradient
+            colors={[
+              ThemeColors.Dark.colors.backdrop,
+              ThemeColors.Dark.colors.primaryContainer,
+            ]}
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+            }}
+          />
+          <View>
+            {userdata && userdata.hasOwnProperty('profile_image_url') && (
+              <View
                 style={{
-                  textShadowOffset: {width: 0, height: 0},
-                  textShadowRadius: 20,
-                  textShadowColor: colors.shadow,
-                }}
-                from="materialIcons"
-                name="verified"
-                size={36}
-                color={MD3Colors.tertiary80}
-              />
+                  borderWidth: 6,
+                  borderColor: userdata.color?.length
+                    ? userdata.color
+                    : 'transparent',
+                  borderRadius: 100,
+                }}>
+                <Avatar.Image
+                  size={150}
+                  style={{backgroundColor: userdata.color}}
+                  source={{uri: userdata.profile_image_url}}
+                />
+              </View>
             )}
-        </View>
-        {userdata && userdata.login && !!userdata.login.length && (
-          <Text
-            variant="headlineSmall"
-            style={[
-              {
-                color: MD3Colors.tertiary80,
-                textAlign: 'center',
-                paddingBottom: 10,
-              },
-            ]}>
-            @{userdata.login}
-          </Text>
-        )}
-        {userdata && userdata.description && !!userdata.description.length && (
-          <>
+            {userdata &&
+              userdata.stream &&
+              userdata.stream.type &&
+              !!userdata.stream.type.length && (
+                <Badge
+                  size={30}
+                  style={{
+                    position: 'absolute',
+                    right: -10,
+                    top: 10,
+                    color: '#fff',
+                    backgroundColor: '#f44336',
+                  }}>
+                  {userdata.stream.type === 'live' ? 'AO VIVO' : 'RERUN'}
+                </Badge>
+              )}
+          </View>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 2,
+            }}>
             <Text
-              variant="bodyMedium"
-              numberOfLines={3}
               style={[
+                fonts.displayMedium,
                 {
-                  color: MD3Colors.neutralVariant99,
-                  textShadowOffset: {width: 1, height: 1},
+                  color: MD3Colors.tertiary95,
+                  textAlign: 'center',
+                  fontWeight: 'bold',
+                  textShadowOffset: {width: 2, height: 2},
                   textShadowRadius: 5,
                   textShadowColor: colors.shadow,
-                  textAlign: 'center',
-                  paddingHorizontal: 20,
                 },
               ]}>
-              {userdata.description}
+              {userdata?.display_name}
+              {userdata &&
+                userdata.broadcaster_type &&
+                userdata.broadcaster_type === 'partner' && (
+                  <Icon
+                    style={{
+                      textShadowOffset: {width: 0, height: 0},
+                      textShadowRadius: 20,
+                      textShadowColor: colors.shadow,
+                    }}
+                    from="materialIcons"
+                    name="verified"
+                    size={30}
+                    color={MD3Colors.tertiary80}
+                  />
+                )}
             </Text>
-          </>
-        )}
-      </ImageBackground>
-      <Card
-        mode="elevated"
-        contentStyle={{
-          backgroundColor: colors.surface,
-        }}>
-        <Card.Content
+          </View>
+          {userdata && userdata.login && !!userdata.login.length && (
+            <Text
+              variant="headlineSmall"
+              style={[
+                {
+                  color: MD3Colors.tertiary80,
+                  textAlign: 'center',
+                  paddingBottom: 10,
+                },
+              ]}>
+              @{userdata.login}
+            </Text>
+          )}
+          {userdata &&
+            userdata.description &&
+            !!userdata.description.length && (
+              <>
+                <Text
+                  variant="bodyMedium"
+                  numberOfLines={3}
+                  style={[
+                    {
+                      color: MD3Colors.neutralVariant99,
+                      textShadowOffset: {width: 1, height: 1},
+                      textShadowRadius: 5,
+                      textShadowColor: colors.shadow,
+                      textAlign: 'center',
+                      paddingHorizontal: 20,
+                    },
+                  ]}>
+                  {userdata.description}
+                </Text>
+              </>
+            )}
+        </ImageBackground>
+        <View
           style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
+            padding: 10,
+            backgroundColor: colors.surface,
+            justifyContent: 'center',
             alignItems: 'center',
+            elevation: 3,
           }}>
           <View
             style={{
-              gap: 8,
-              flex: 1,
+              gap: 10,
               flexDirection: 'row',
             }}>
             <Button
@@ -399,355 +398,224 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
               </Button>
             )}
           </View>
-          <Animated.View
-            style={[
-              {
-                position: 'absolute',
-                right: 10,
-                borderRadius: 100,
-                overflow: 'hidden',
-                opacity: animatedBackButton.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [0, 1],
-                }),
-                transform: [
-                  {
-                    rotate: animatedBackButton.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: ['0deg', '90deg'],
-                    }),
-                  },
-                ],
-              },
-            ]}>
-            <TouchableRipple
-              style={{
-                padding: 10,
-              }}
-              onPress={() => {
-                if (canBackToTop()) {
-                  scrollViewRef.current?.scrollTo({y: 0, x: 0, animated: true});
-                  return;
-                }
-              }}>
-              <Text>
-                <Icon from="materialIcons" name="arrow-back" size={20} />
-              </Text>
-            </TouchableRipple>
-          </Animated.View>
-        </Card.Content>
-      </Card>
-      <Text
-        variant="headlineMedium"
-        style={[
-          Fonts.TwitchyTV,
-          {
-            margin: 10,
-          },
-        ]}>
-        conta
-      </Text>
-      <List.Section>
-        {userdata && userdata.hasOwnProperty('broadcaster_type') && (
-          <>
-            <Divider />
-            <List.Item
-              titleStyle={Fonts.RobotoRegular}
-              descriptionStyle={Fonts.RobotoLight}
-              title="Tipo"
-              description={
-                userdata.broadcaster_type === 'partner'
-                  ? 'Parceira'
-                  : userdata.broadcaster_type === 'affiliate'
-                  ? 'Afiliada'
-                  : 'Normal'
-              }
-            />
-          </>
-        )}
-        {userdata && userdata.id && (
-          <>
-            <Divider />
-            <List.Item
-              titleStyle={Fonts.RobotoRegular}
-              descriptionStyle={Fonts.RobotoLight}
-              title="ID"
-              description={userdata.id}
-            />
-          </>
-        )}
-        {userdata && userdata.login && (
-          <>
-            <Divider />
-            <List.Item
-              titleStyle={Fonts.RobotoRegular}
-              descriptionStyle={Fonts.RobotoLight}
-              title="Cor"
-              description={userdata.color}
-            />
-          </>
-        )}
-        {userdata && userdata.channel && !!userdata.channel.follows && (
-          <>
-            <Divider />
-            <List.Item
-              titleStyle={Fonts.RobotoRegular}
-              descriptionStyle={Fonts.RobotoLight}
-              title="Seguidores"
-              description={Number(userdata.channel.follows).toLocaleString(
-                'pt-BR',
-              )}
-            />
-          </>
-        )}
-        {userdata && userdata.created_at && !!userdata.created_at.length && (
-          <>
-            <Divider />
-            <List.Item
-              titleStyle={Fonts.RobotoRegular}
-              descriptionStyle={Fonts.RobotoLight}
-              title="Idade"
-              description={capitalize(
-                formatDistanceToNowStrict(Date.parse(userdata.created_at), {
-                  locale: ptBR,
-                  roundingMethod: 'floor',
-                }),
-              )}
-            />
-            <Divider />
-            <List.Item
-              titleStyle={Fonts.RobotoRegular}
-              descriptionStyle={Fonts.RobotoLight}
-              title="Criação"
-              description={capitalize(
-                format(Date.parse(userdata.created_at), 'EEE, PPPp', {
-                  locale: ptBR,
-                }),
-              )}
-            />
-          </>
-        )}
-        {userdata &&
-          userdata.channel &&
-          userdata.channel.broadcaster_language &&
-          !!userdata.channel.broadcaster_language.length && (
+        </View>
+        <Text
+          variant="headlineMedium"
+          style={[
+            Fonts.TwitchyTV,
+            {
+              margin: 10,
+            },
+          ]}>
+          conta
+        </Text>
+        <List.Section>
+          {userdata && userdata.hasOwnProperty('broadcaster_type') && (
             <>
               <Divider />
               <List.Item
                 titleStyle={Fonts.RobotoRegular}
                 descriptionStyle={Fonts.RobotoLight}
-                title="Língua"
-                description={ISO6391.getNativeName(
-                  userdata.channel.broadcaster_language,
+                title="Tipo"
+                description={
+                  userdata.broadcaster_type === 'partner'
+                    ? 'Parceira'
+                    : userdata.broadcaster_type === 'affiliate'
+                    ? 'Afiliada'
+                    : 'Normal'
+                }
+              />
+            </>
+          )}
+          {userdata && userdata.id && (
+            <>
+              <Divider />
+              <List.Item
+                titleStyle={Fonts.RobotoRegular}
+                descriptionStyle={Fonts.RobotoLight}
+                title="ID"
+                description={userdata.id}
+              />
+            </>
+          )}
+          {userdata && userdata.login && (
+            <>
+              <Divider />
+              <List.Item
+                titleStyle={Fonts.RobotoRegular}
+                descriptionStyle={Fonts.RobotoLight}
+                title="Cor"
+                description={userdata.color}
+              />
+            </>
+          )}
+          {userdata && userdata.channel && !!userdata.channel.follows && (
+            <>
+              <Divider />
+              <List.Item
+                titleStyle={Fonts.RobotoRegular}
+                descriptionStyle={Fonts.RobotoLight}
+                title="Seguidores"
+                description={Number(userdata.channel.follows).toLocaleString(
+                  'pt-BR',
                 )}
               />
             </>
           )}
-        {userdata &&
-          userdata.channel &&
-          userdata.channel.title &&
-          !!userdata.channel.title.length && (
+          {userdata && userdata.created_at && !!userdata.created_at.length && (
             <>
               <Divider />
               <List.Item
                 titleStyle={Fonts.RobotoRegular}
                 descriptionStyle={Fonts.RobotoLight}
-                title="Título"
-                description={userdata.channel.title}
+                title="Idade"
+                description={capitalize(
+                  formatDistanceToNowStrict(Date.parse(userdata.created_at), {
+                    locale: ptBR,
+                    roundingMethod: 'floor',
+                  }),
+                )}
+              />
+              <Divider />
+              <List.Item
+                titleStyle={Fonts.RobotoRegular}
+                descriptionStyle={Fonts.RobotoLight}
+                title="Criação"
+                description={capitalize(
+                  format(Date.parse(userdata.created_at), 'EEE, PPPp', {
+                    locale: ptBR,
+                  }),
+                )}
               />
             </>
           )}
-        {userdata &&
-          userdata.channel &&
-          userdata.channel.game_name &&
-          !!userdata.channel.game_name.length && (
+          {userdata &&
+            userdata.channel &&
+            userdata.channel.broadcaster_language &&
+            !!userdata.channel.broadcaster_language.length && (
+              <>
+                <Divider />
+                <List.Item
+                  titleStyle={Fonts.RobotoRegular}
+                  descriptionStyle={Fonts.RobotoLight}
+                  title="Língua"
+                  description={ISO6391.getNativeName(
+                    userdata.channel.broadcaster_language,
+                  )}
+                />
+              </>
+            )}
+          {userdata &&
+            userdata.channel &&
+            userdata.channel.title &&
+            !!userdata.channel.title.length && (
+              <>
+                <Divider />
+                <List.Item
+                  titleStyle={Fonts.RobotoRegular}
+                  descriptionStyle={Fonts.RobotoLight}
+                  title="Título"
+                  description={userdata.channel.title}
+                />
+              </>
+            )}
+          {userdata &&
+            userdata.channel &&
+            userdata.channel.game_name &&
+            !!userdata.channel.game_name.length && (
+              <>
+                <Divider />
+                <List.Item
+                  titleStyle={Fonts.RobotoRegular}
+                  descriptionStyle={Fonts.RobotoLight}
+                  title="Categoria"
+                  description={userdata.channel.game_name}
+                />
+              </>
+            )}
+          {userdata &&
+            userdata.stream &&
+            userdata.stream.started_at &&
+            !!userdata.stream.started_at.length && (
+              <>
+                <Divider />
+                <List.Item
+                  titleStyle={Fonts.RobotoRegular}
+                  descriptionStyle={Fonts.RobotoLight}
+                  title={
+                    userdata.stream.type === 'live'
+                      ? 'Ao vivo há'
+                      : 'Reprisando há'
+                  }
+                  description={streamUptime}
+                />
+              </>
+            )}
+          {userdata && userdata.stream && userdata.stream.viewer_count && (
             <>
               <Divider />
               <List.Item
                 titleStyle={Fonts.RobotoRegular}
                 descriptionStyle={Fonts.RobotoLight}
-                title="Categoria"
-                description={userdata.channel.game_name}
+                title="Espectadores"
+                description={Number(
+                  userdata.stream.viewer_count,
+                ).toLocaleString('pt-br')}
               />
             </>
           )}
-        {userdata &&
-          userdata.stream &&
-          userdata.stream.started_at &&
-          !!userdata.stream.started_at.length && (
+          {userdata && userdata.stream && userdata.stream.is_mature && (
             <>
               <Divider />
               <List.Item
                 titleStyle={Fonts.RobotoRegular}
                 descriptionStyle={Fonts.RobotoLight}
-                title={
-                  userdata.stream.type === 'live'
-                    ? 'Ao vivo há'
-                    : 'Reprisando há'
-                }
-                description={streamUptime}
+                title="Público"
+                description={userdata.stream.is_mature ? '+18' : 'Livre'}
               />
             </>
           )}
-        {userdata && userdata.stream && userdata.stream.viewer_count && (
-          <>
-            <Divider />
-            <List.Item
-              titleStyle={Fonts.RobotoRegular}
-              descriptionStyle={Fonts.RobotoLight}
-              title="Espectadores"
-              description={Number(userdata.stream.viewer_count).toLocaleString(
-                'pt-br',
-              )}
-            />
-          </>
-        )}
-        {userdata && userdata.stream && userdata.stream.is_mature && (
-          <>
-            <Divider />
-            <List.Item
-              titleStyle={Fonts.RobotoRegular}
-              descriptionStyle={Fonts.RobotoLight}
-              title="Público"
-              description={userdata.stream.is_mature ? '+18' : 'Livre'}
-            />
-          </>
-        )}
-        {userdata && userdata.badges && !!userdata.badges.length && (
-          <>
-            <Divider />
-            <List.Item
-              titleStyle={Fonts.RobotoRegular}
-              title="Badges"
-              description={() => {
-                const mergedBadges = userdata.badges?.flatMap(badges => {
-                  const uniqBadges = uniqBy(badges?.versions, 'title');
-                  return uniqBadges.map(badge => (
-                    <Tooltip
-                      enterTouchDelay={100}
-                      title={badge.title as string}
-                      key={badge.id}>
-                      <Image
-                        source={{
-                          uri: badge.image_url_2x,
-                          width: 36,
-                          height: 36,
-                        }}
-                      />
-                    </Tooltip>
-                  ));
-                });
-                return (
-                  <View
-                    style={{
-                      gap: 10,
-                      flexWrap: 'wrap',
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                      marginTop: 5,
-                    }}>
-                    {mergedBadges}
-                  </View>
-                );
-              }}
-            />
-          </>
-        )}
-        {userdata && userdata.emotes && !!userdata.emotes.length && (
-          <>
-            <Divider />
-            <List.Item
-              titleStyle={Fonts.RobotoRegular}
-              descriptionStyle={{
-                flex: 1,
-                flexDirection: 'row',
-                flexWrap: 'wrap',
-              }}
-              title="Emotes"
-              description={() => {
-                const emotes = userdata.emotes?.map(emote => (
-                  <Tooltip
-                    enterTouchDelay={100}
-                    title={emote.name as string}
-                    key={emote.id}>
-                    <Image
-                      source={{
-                        uri: emote.images?.url_2x,
-                        width: 48,
-                        height: 48,
-                      }}
-                    />
-                  </Tooltip>
-                ));
-                return (
-                  <View
-                    style={{
-                      gap: 10,
-                      flexWrap: 'wrap',
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                      marginTop: 5,
-                    }}>
-                    {emotes}
-                  </View>
-                );
-              }}
-            />
-          </>
-        )}
-        {userdata &&
-          userdata.chatstate &&
-          Object.values(userdata.chatstate).some(value => value === true) && (
+          {userdata && userdata.badges && !!userdata.badges.length && (
             <>
               <Divider />
               <List.Item
                 titleStyle={Fonts.RobotoRegular}
-                descriptionStyle={{
-                  flex: 1,
-                  flexDirection: 'row',
-                  flexWrap: 'wrap',
-                }}
-                title="Chat"
+                title="Badges"
                 description={() => {
-                  const only_emotes = userdata.chatstate?.emote_mode && (
-                    <Chip>Somente emotes</Chip>
-                  );
-                  const only_follows = userdata.chatstate?.follower_mode && (
-                    <Chip>Somente seguidores</Chip>
-                  );
-                  const only_subs = userdata.chatstate?.subscriber_mode && (
-                    <Chip>Somente inscritos</Chip>
-                  );
-                  const slow_mode = userdata.chatstate?.slow_mode && (
-                    <Chip>Modo lento</Chip>
-                  );
-                  const unique_mode = userdata.chatstate?.unique_chat_mode && (
-                    <Chip>Sem repetições</Chip>
-                  );
-
+                  const mergedBadges = userdata.badges?.flatMap(badges => {
+                    const uniqBadges = uniqBy(badges?.versions, 'title');
+                    return uniqBadges.map(badge => (
+                      <Tooltip
+                        enterTouchDelay={100}
+                        title={badge.title as string}
+                        key={badge.id}>
+                        <Image
+                          source={{
+                            uri: badge.image_url_2x,
+                            width: 36,
+                            height: 36,
+                          }}
+                        />
+                      </Tooltip>
+                    ));
+                  });
                   return (
                     <View
                       style={{
-                        marginVertical: 5,
-                        flexDirection: 'row',
+                        gap: 10,
                         flexWrap: 'wrap',
-                        gap: 5,
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        marginTop: 5,
                       }}>
-                      {only_emotes}
-                      {only_follows}
-                      {only_subs}
-                      {slow_mode}
-                      {unique_mode}
+                      {mergedBadges}
                     </View>
                   );
                 }}
               />
             </>
           )}
-        {userdata &&
-          userdata.channel &&
-          userdata.channel.tags &&
-          !!userdata.channel.tags.length && (
+          {userdata && userdata.emotes && !!userdata.emotes.length && (
             <>
               <Divider />
               <List.Item
@@ -757,26 +625,160 @@ export default function TwitchUserPage(props: NativeStackScreenProps<any>) {
                   flexDirection: 'row',
                   flexWrap: 'wrap',
                 }}
-                title="Tags"
-                description={() => (
-                  <ChipList chips={userdata.channel?.tags || []} />
-                )}
+                title="Emotes"
+                description={() => {
+                  const emotes = userdata.emotes?.map(emote => (
+                    <Tooltip
+                      enterTouchDelay={100}
+                      title={emote.name as string}
+                      key={emote.id}>
+                      <Image
+                        source={{
+                          uri: emote.images?.url_2x,
+                          width: 48,
+                          height: 48,
+                        }}
+                      />
+                    </Tooltip>
+                  ));
+                  return (
+                    <View
+                      style={{
+                        gap: 10,
+                        flexWrap: 'wrap',
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        marginTop: 5,
+                      }}>
+                      {emotes}
+                    </View>
+                  );
+                }}
               />
             </>
           )}
-      </List.Section>
-      {userdata &&
-        userdata.schedule &&
-        !!userdata.schedule.segments?.length && (
-          <TwitchSchedule data={userdata.schedule} />
+          {userdata &&
+            userdata.chatstate &&
+            Object.values(userdata.chatstate).some(value => value === true) && (
+              <>
+                <Divider />
+                <List.Item
+                  titleStyle={Fonts.RobotoRegular}
+                  descriptionStyle={{
+                    flex: 1,
+                    flexDirection: 'row',
+                    flexWrap: 'wrap',
+                  }}
+                  title="Chat"
+                  description={() => {
+                    const only_emotes = userdata.chatstate?.emote_mode && (
+                      <Chip>Somente emotes</Chip>
+                    );
+                    const only_follows = userdata.chatstate?.follower_mode && (
+                      <Chip>Somente seguidores</Chip>
+                    );
+                    const only_subs = userdata.chatstate?.subscriber_mode && (
+                      <Chip>Somente inscritos</Chip>
+                    );
+                    const slow_mode = userdata.chatstate?.slow_mode && (
+                      <Chip>Modo lento</Chip>
+                    );
+                    const unique_mode = userdata.chatstate
+                      ?.unique_chat_mode && <Chip>Sem repetições</Chip>;
+
+                    return (
+                      <View
+                        style={{
+                          marginVertical: 5,
+                          flexDirection: 'row',
+                          flexWrap: 'wrap',
+                          gap: 5,
+                        }}>
+                        {only_emotes}
+                        {only_follows}
+                        {only_subs}
+                        {slow_mode}
+                        {unique_mode}
+                      </View>
+                    );
+                  }}
+                />
+              </>
+            )}
+          {userdata &&
+            userdata.channel &&
+            userdata.channel.tags &&
+            !!userdata.channel.tags.length && (
+              <>
+                <Divider />
+                <List.Item
+                  titleStyle={Fonts.RobotoRegular}
+                  descriptionStyle={{
+                    flex: 1,
+                    flexDirection: 'row',
+                    flexWrap: 'wrap',
+                  }}
+                  title="Tags"
+                  description={() => (
+                    <ChipList chips={userdata.channel?.tags || []} />
+                  )}
+                />
+              </>
+            )}
+        </List.Section>
+        {userdata &&
+          userdata.schedule &&
+          !!userdata.schedule.segments?.length && (
+            <TwitchSchedule data={userdata.schedule} />
+          )}
+        {userdata && userdata.clips && (
+          <TwitchVideos type="clips" userId={userdata.id as string} />
         )}
-      {userdata && userdata.clips && (
-        <TwitchVideos type="clips" userId={userdata.id as string} />
-      )}
-      {userdata && userdata.videos && (
-        <TwitchVideos type="videos" userId={userdata.id as string} />
-      )}
-    </ScrollView>
+        {userdata && userdata.videos && (
+          <TwitchVideos type="videos" userId={userdata.id as string} />
+        )}
+      </ScrollView>
+
+      <Animated.View
+        style={[
+          {
+            position: 'absolute',
+            margin: 16,
+            bottom: 0,
+            right: 0,
+            backgroundColor: colors.primaryContainer,
+            borderRadius: 100,
+            overflow: 'hidden',
+            opacity: animatedBackButton.interpolate({
+              inputRange: [0, 1],
+              outputRange: [0, 1],
+            }),
+            transform: [
+              {
+                rotate: animatedBackButton.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: ['0deg', '90deg'],
+                }),
+              },
+            ],
+          },
+        ]}>
+        <TouchableRipple
+          style={{
+            padding: 10,
+          }}
+          onPress={() => {
+            if (canBackToTop()) {
+              scrollViewRef.current?.scrollTo({y: 0, x: 0, animated: true});
+              return;
+            }
+          }}>
+          <Text>
+            <Icon from="materialIcons" name="arrow-back" size={20} />
+          </Text>
+        </TouchableRipple>
+      </Animated.View>
+    </React.Fragment>
   );
 }
 

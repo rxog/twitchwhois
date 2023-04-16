@@ -38,6 +38,7 @@ export default function MonitorPage() {
     <FlatList
       data={results}
       keyExtractor={item => item.username}
+      stickyHeaderIndices={[0]}
       ListHeaderComponent={() => (
         <View style={style.headerComponent}>
           <View style={style.Available}>
