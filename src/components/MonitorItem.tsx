@@ -1,105 +1,72 @@
-/* eslint-disable react-native/no-inline-styles */
-import React, {useEffect, useState} from 'react';
-import {
-  ActivityIndicator,
-  Button,
-  Card,
-  Divider,
-  Text,
-  useTheme,
-} from 'react-native-paper';
+import React from 'react';
 import Icon from './Icon';
-import {Alert, View} from 'react-native';
+import {Alert, StyleSheet, Text, View} from 'react-native';
 import format from 'date-fns/format';
 import ptBR from 'date-fns/locale/pt-BR';
-import isPast from 'date-fns/isPast';
-import formatDistanceToNowStrict from 'date-fns/formatDistanceToNowStrict';
 import {useDispatch} from 'react-redux';
-import {actions, ResultsState} from '@/store/reducers/results';
+import {MonitorActions, MonitorItem as Item} from '@/store/Monitor';
+import Divider from './Divider';
+import {colors} from '@/assets/styles';
+import Button from './Button';
 
-export default function MonitorItem({item}: {item: ResultsState}) {
+export default function MonitorItem({item}: {item: Item}) {
   const dispatch = useDispatch();
-  const {colors} = useTheme();
 
-  const [timeRemaining, setTimeRemaining] = useState<string | null>(null);
-
-  useEffect(() => {
-    const nextDate = Date.parse(item.nextCheck as string);
-
-    const updateRemaining = () => {
-      const isPastDate = isPast(nextDate);
-      if (isPastDate) {
-        clearInterval(intervalId);
-        setTimeRemaining('instantes');
-      } else {
-        const formatTimeRemaining = formatDistanceToNowStrict(nextDate, {
-          locale: ptBR,
-        });
-        setTimeRemaining(formatTimeRemaining);
-      }
-    };
-
-    updateRemaining();
-
-    const intervalId = setInterval(updateRemaining, 1000);
-
-    return () => clearInterval(intervalId);
-  }, [item.nextCheck]);
-
-  if (timeRemaining === null) {
-    return <ActivityIndicator />;
-  }
-
-  const color = item.status === 1 ? '#66bb6a' : '#f44336';
-  const icon = item.status === 1 ? 'mood' : 'mood-bad';
+  const color = item.isAvailable ? colors.success : colors.error;
+  const icon = item.isAvailable ? 'mood' : 'mood-bad';
+  const styles = StyleSheet.create({
+    main: {
+      marginHorizontal: 10,
+      marginBottom: 10,
+      backgroundColor: colors.backgroundVariant,
+      padding: 20,
+      borderRadius: 20,
+    },
+    text: {color: colors.text},
+    muted: {color: colors.muted},
+    iconName: {flexDirection: 'row', alignItems: 'center'},
+    username: {
+      fontWeight: 'bold',
+      marginTop: -5,
+      fontSize: 30,
+      color,
+    },
+    actions: {
+      flexDirection: 'row',
+      justifyContent: 'flex-end',
+      alignItems: 'center',
+      gap: 20,
+    },
+  });
 
   return (
-    <Card
-      style={{
-        marginHorizontal: 10,
-        marginBottom: 10,
-      }}>
-      <Card.Content>
-        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+    <View style={styles.main}>
+      <View>
+        <View style={styles.iconName}>
           <Icon from="materialIcons" color={color} name={icon} size={40} />
-          <Text
-            variant="displayMedium"
-            style={[
-              {
-                fontWeight: 'bold',
-                marginTop: -5,
-                color,
-              },
-            ]}>
-            {item.username}
-          </Text>
+          <Text style={styles.username}>{item.userName}</Text>
         </View>
-        <Divider style={{marginVertical: 10}} />
-        <Text variant="bodyMedium">
+        <Divider />
+        <Text style={styles.text}>
           Atualizado{' '}
-          {format(Date.parse(item.lastCheck as string), 'eee, PPPpp', {
+          {format(Date.parse(item.lastCheckedAt as string), 'eee, PPPpp', {
             locale: ptBR,
           })}
         </Text>
-        <Divider style={{marginTop: 10}} />
-      </Card.Content>
-      <Card.Actions>
-        <Text variant="bodySmall" style={{color: colors.onSurfaceDisabled}}>
-          {item.running ? `Atualiza em ${timeRemaining}` : 'Parado'}
-        </Text>
+        <Divider />
+      </View>
+      <View style={styles.actions}>
+        {!item.isMonitoring && <Text style={styles.muted}>Parado</Text>}
         <Button
-          mode="elevated"
-          textColor={colors.onErrorContainer}
-          buttonColor={colors.errorContainer}
           onPress={async () => {
             Alert.alert(
-              `Apagar @${item.username}?`,
+              `Apagar @${item.userName}?`,
               'Essa ação não pode ser desfeita.',
               [
                 {
                   text: 'Apagar',
                   onPress: () => {
-                    dispatch(actions.removeResult(item.username));
+                    dispatch(MonitorActions.remove(item.userName));
                   },
                 },
                 {
@@ -112,21 +79,16 @@ export default function MonitorItem({item}: {item: ResultsState}) {
           <Icon from="octicons" name="trash" size={20} />
         </Button>
         <Button
-          mode="elevated"
-          textColor={colors.onPrimaryContainer}
-          buttonColor={
-            item.running ? colors.primaryContainer : colors.surfaceDisabled
-          }
           onPress={async () => {
-            if (item.running) {
-              dispatch(actions.saveResult({...item, running: false}));
+            if (item.isMonitoring) {
+              dispatch(MonitorActions.update({...item, isMonitoring: false}));
               return;
             }
-            dispatch(actions.saveResult({...item, running: true}));
+            dispatch(MonitorActions.update({...item, isMonitoring: true}));
           }}>
           <Icon name="play-pause" size={20} />
         </Button>
-      </Card.Actions>
-    </Card>
+      </View>
+    </View>
   );
 }

@@ -1,9 +1,9 @@
 import axios, {AxiosInstance} from 'axios';
 import {
-  TwitchAllData,
+  TwitchData,
   TwitchTopGameStreams,
   TwitchTopGames,
-} from './types/TwitchData';
+} from '../types/TwitchData';
 import {getUserAgentSync} from 'react-native-device-info';
 
 export default class Twitch {
@@ -11,7 +11,7 @@ export default class Twitch {
     baseURL: 'https://twitchwhois-backend.vercel.app/api/',
   });
 
-  static async getAllData(username: string): Promise<TwitchAllData | null> {
+  static async getAllData(username: string): Promise<TwitchData | null> {
     try {
       const twitchUser = await this.API.get(`getalldata/${username}`);
       return twitchUser.data;

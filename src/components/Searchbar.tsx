@@ -2,10 +2,10 @@
 import React from 'react';
 import {useFocusEffect} from '@react-navigation/native';
 import {TextInput, TextInputProps, View, Pressable} from 'react-native';
-import {Snackbar, Portal, useTheme} from 'react-native-paper';
 import {useNetInfo} from '@react-native-community/netinfo';
-import Username from '@/utils/Username';
+import username from '@/utils/username';
 import Icon from './Icon';
+import {colors} from '@/assets/styles';
 
 interface SearchbarProps extends Omit<TextInputProps, 'value'> {
   value?: string;
@@ -16,7 +16,6 @@ export default function Searchbar({
   value = '',
   ...props
 }: SearchbarProps): JSX.Element {
-  const {colors} = useTheme();
   const [searchQuery, setSearchQuery] = React.useState(value);
   const [isLoading, setIsLoading] = React.useState(false);
   const [hasError, setHasError] = React.useState<string | null>(null);
@@ -37,7 +36,7 @@ export default function Searchbar({
   }, [searchInput]);
 
   const onChangeText = React.useCallback((text: string) => {
-    setSearchQuery(Username.parse(text));
+    setSearchQuery(username.parse(text));
   }, []);
 
   const onSubmit = () => {
@@ -45,7 +44,7 @@ export default function Searchbar({
       setHasError('Sem conexão com internet!');
       return;
     }
-    if (Username.isValid(searchQuery)) {
+    if (username.isValid(searchQuery)) {
       setHasError(null);
       setIsLoading(true);
       props.onSubmit?.(searchQuery);
@@ -127,19 +126,6 @@ export default function Searchbar({
           />
         </Pressable>
       )}
-      <Portal>
-        <Snackbar
-          visible={!!hasError}
-          onDismiss={() => setHasError(null)}
-          action={{
-            label: 'OK',
-            onPress: () => {
-              searchInput.current?.focus();
-            },
-          }}>
-          {hasError}
-        </Snackbar>
-      </Portal>
     </View>
   );
 }

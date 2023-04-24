@@ -1,17 +1,17 @@
 import {configureStore} from '@reduxjs/toolkit';
 import {rememberReducer, rememberEnhancer} from 'redux-remember';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import settingsReducer from './reducers/settings';
-import resultsReducer from './reducers/results';
+import {SettingsReducer} from './Settings';
+import {MonitorReducer} from './Monitor';
 
 const reducers = {
-  settings: settingsReducer,
-  results: resultsReducer,
+  settings: SettingsReducer,
+  monitor: MonitorReducer,
 };
 
 const reducer = rememberReducer(reducers);
 
-export const store = configureStore({
+export const Store = configureStore({
   reducer,
   enhancers: [
     rememberEnhancer(AsyncStorage, Object.keys(reducers), {
@@ -20,5 +20,5 @@ export const store = configureStore({
   ],
 });
 
-export type AppDispatch = typeof store.dispatch;
-export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof Store.dispatch;
+export type RootState = ReturnType<typeof Store.getState>;

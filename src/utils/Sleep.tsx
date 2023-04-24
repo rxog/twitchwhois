@@ -1,4 +1,4 @@
-export default function Sleep(
+export default function sleep(
   time: number,
   cancelToken?: AbortSignal,
 ): Promise<void> {

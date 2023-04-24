@@ -1,32 +1,12 @@
 import React from 'react';
-import {Linking, StatusBar} from 'react-native';
+import {StatusBar} from 'react-native';
 import notifee, {EventType} from '@notifee/react-native';
 import Navigation, {navigationRef} from './routes';
 import {
-  Provider,
-  MD3DarkTheme,
-  MD3LightTheme,
-  adaptNavigationTheme,
-} from 'react-native-paper';
-import {
   NavigationContainer,
-  DarkTheme as NavigationDarkTheme,
-  DefaultTheme as NavigationDefaultTheme,
   NavigationContainerRefWithCurrent,
 } from '@react-navigation/native';
-import {Dark, Light} from './pages/Styles/ThemeColors';
-import {useSelector} from 'react-redux';
-import {RootState} from '@/store';
-
-const LayoutDarkTheme = {...MD3DarkTheme, ...Dark};
-const LayoutLightTheme = {...MD3LightTheme, ...Light};
-
-const {LightTheme: NavLight, DarkTheme: NavDark} = adaptNavigationTheme({
-  reactNavigationLight: NavigationDefaultTheme,
-  reactNavigationDark: NavigationDarkTheme,
-  materialLight: LayoutLightTheme,
-  materialDark: LayoutDarkTheme,
-});
+import {colors} from './assets/styles';
 
 function App(): JSX.Element {
   React.useEffect(() => {
@@ -35,9 +15,7 @@ function App(): JSX.Element {
       if (type === EventType.PRESS) {
         const screen = pressAction?.id;
 
-        if (screen === 'go-twitch') {
-          Linking.openURL('https://twitch.tv/');
-        } else if (screen && navigationRef.isReady()) {
+        if (screen && navigationRef.isReady()) {
           (navigationRef as NavigationContainerRefWithCurrent<any>).navigate(
             screen,
           );
@@ -50,31 +28,23 @@ function App(): JSX.Element {
     });
   }, []);
 
-  const dark = useSelector((state: RootState) => state.settings.dark);
-
-  const NavTheme = dark ? NavDark : NavLight;
-  const Theme = dark ? LayoutDarkTheme : LayoutLightTheme;
-
   return (
-    <Provider theme={Theme}>
-      <StatusBar
-        barStyle={dark ? 'light-content' : 'dark-content'}
-        backgroundColor={NavTheme.colors.background}
-      />
-      <NavigationContainer
-        ref={navigationRef}
-        linking={{
-          prefixes: ['twitchwhois://'],
-          config: {
-            screens: {
-              monitor: 'monitor',
-            },
+    <NavigationContainer
+      ref={navigationRef}
+      linking={{
+        prefixes: ['twitchwhois://'],
+        config: {
+          screens: {
+            monitor: 'monitor',
           },
-        }}
-        theme={NavTheme}>
-        <Navigation />
-      </NavigationContainer>
-    </Provider>
+        },
+      }}>
+      <StatusBar
+        barStyle={'light-content'}
+        backgroundColor={colors.background}
+      />
+      <Navigation />
+    </NavigationContainer>
   );
 }
 

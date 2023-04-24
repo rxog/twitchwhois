@@ -1,16 +1,15 @@
 import BackgroundTask from './BackgroundTask';
-import isBefore from 'date-fns/isBefore';
-import addMinutes from 'date-fns/addMinutes';
-import {store} from '@/store';
-import {actions} from '@/store/reducers/results';
+import {Store} from '@/store';
+import {MonitorActions} from '@/store/Monitor';
 import displayNotification from '@/modules/DisplayNotification';
-import TwitchAPI from '@/utils/TwitchAPI';
-import Sleep from '@/utils/Sleep';
+import {isPast, addMinutes} from 'date-fns';
+import TwitchAPI from '@/utils/Twitch';
+import sleep from '@/utils/sleep';
 
 export default function RunBackgroundTask() {
-  const runningTasks = store
-    .getState()
-    .results.filter(task => task.running).length;
+  const runningTasks = Store.getState().monitor.filter(
+    task => task.isMonitoring,
+  ).length;
 
   if (runningTasks && BackgroundTask.isRunning) {
     return;
@@ -24,48 +23,47 @@ export default function RunBackgroundTask() {
 
   BackgroundTask.run(async ({signal}: {signal: AbortSignal}) => {
     try {
-      const dispatch = store.dispatch;
-      const {results, settings} = store.getState();
+      const dispatch = Store.dispatch;
+      const {monitor, settings} = Store.getState();
 
-      for (const {username, nextCheck} of results.filter(
-        result => result.running,
+      for (const {userName, nextCheckAt} of monitor.filter(
+        result => result.isMonitoring,
       )) {
         const now = new Date();
-        const next = nextCheck ? Date.parse(nextCheck) : now;
-        const timeouted = isBefore(next, now);
+        const next = nextCheckAt ? Date.parse(nextCheckAt) : 0;
 
-        if (timeouted) {
-          await TwitchAPI.isAvailable(username, signal).then(async status => {
+        if (isPast(next)) {
+          await TwitchAPI.isAvailable(userName, signal).then(async status => {
             if (status === 1) {
-              displayNotification(username);
+              displayNotification(userName);
               dispatch(
-                actions.saveResult({
-                  username,
-                  lastCheck: now.toISOString(),
-                  nextCheck: addMinutes(
+                MonitorActions.update({
+                  userName,
+                  lastCheckedAt: now.toISOString(),
+                  nextCheckAt: addMinutes(
                     now,
-                    settings.interval * 2,
+                    settings.interval * 10,
                   ).toISOString(),
-                  status,
+                  isAvailable: true,
                 }),
               );
             } else {
               dispatch(
-                actions.saveResult({
-                  username,
-                  lastCheck: now.toISOString(),
-                  nextCheck: addMinutes(now, settings.interval).toISOString(),
-                  status,
+                MonitorActions.update({
+                  userName,
+                  lastCheckedAt: now.toISOString(),
+                  nextCheckAt: addMinutes(now, settings.interval).toISOString(),
+                  isAvailable: false,
                 }),
               );
             }
           });
         }
-        await Sleep(1000);
+        await sleep(1000);
       }
     } catch (err) {
       console.log(err);
     }
-    await Sleep(15000);
+    await sleep(15000);
   });
 }

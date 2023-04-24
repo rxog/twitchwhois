@@ -1,23 +1,24 @@
 /* eslint-disable react/no-unstable-nested-components */
 import React, {useMemo} from 'react';
-import {View, FlatList, StyleSheet} from 'react-native';
+import {View, FlatList, StyleSheet, Text} from 'react-native';
 import {RootState} from '@/store';
 import {useSelector} from 'react-redux';
-import {Text, useTheme} from 'react-native-paper';
 import Icon from '@/components/Icon';
 import {sortBy} from 'lodash';
 import MonitorItem from '@/components/MonitorItem';
+import {colors} from '@/assets/styles';
+import Headline from '@/components/Headline';
+import StatusBar from '@/components/StatusBar';
 
 export default function MonitorPage() {
-  const {colors} = useTheme();
-  const reduxData = useSelector((state: RootState) => state.results);
+  const monitor = useSelector((state: RootState) => state.monitor);
 
   const results = useMemo(() => {
-    const sorted = sortBy(reduxData, 'username');
+    const sorted = sortBy(monitor, 'userName');
     return sorted;
-  }, [reduxData]);
+  }, [monitor]);
 
-  const style = StyleSheet.create({
+  const styles = StyleSheet.create({
     headerComponent: {
       flexDirection: 'row',
       justifyContent: 'space-evenly',
@@ -27,36 +28,55 @@ export default function MonitorPage() {
       marginBottom: 10,
       padding: 10,
     },
-    Available: {
+    headerItem: {
       flexDirection: 'row',
       alignItems: 'center',
     },
-    NotAvailable: {flexDirection: 'row', alignItems: 'center'},
+    text: {
+      color: colors.text,
+    },
+    main: {
+      backgroundColor: colors.background,
+      flex: 1,
+    },
+    headline: {
+      padding: 20,
+      textAlign: 'center',
+    },
   });
 
   return (
-    <FlatList
-      data={results}
-      keyExtractor={item => item.username}
-      stickyHeaderIndices={[0]}
-      ListHeaderComponent={() => (
-        <View style={style.headerComponent}>
-          <View style={style.Available}>
-            <Text>Disponível: </Text>
-            <Icon from="materialIcons" name="mood" size={30} color="#66bb6a" />
+    <View style={styles.main}>
+      <StatusBar barStyle="light-content" backgroundColor={colors.background} />
+      <Headline style={styles.headline}>Monitor</Headline>
+      <FlatList
+        data={results}
+        keyExtractor={item => item.userName}
+        stickyHeaderIndices={[0]}
+        ListHeaderComponent={() => (
+          <View style={styles.headerComponent}>
+            <View style={styles.headerItem}>
+              <Text style={styles.text}>Disponível: </Text>
+              <Icon
+                from="materialIcons"
+                name="mood"
+                size={30}
+                color={colors.success}
+              />
+            </View>
+            <View style={styles.headerItem}>
+              <Text style={styles.text}>Indisponível: </Text>
+              <Icon
+                from="materialIcons"
+                name="mood-bad"
+                color={colors.error}
+                size={30}
+              />
+            </View>
           </View>
-          <View style={style.NotAvailable}>
-            <Text>Indisponível: </Text>
-            <Icon
-              from="materialIcons"
-              name="mood-bad"
-              color="#f44336"
-              size={30}
-            />
-          </View>
-        </View>
-      )}
-      renderItem={({item}) => <MonitorItem item={item} />}
-    />
+        )}
+        renderItem={({item}) => <MonitorItem item={item} />}
+      />
+    </View>
   );
 }

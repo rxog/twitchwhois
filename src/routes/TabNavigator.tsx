@@ -1,60 +1,36 @@
-/* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react/no-unstable-nested-components */
 import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import StackNavigator from './StackNavigator';
-import SettingsPage from '@/pages/Settings';
-import MonitorPage from '@/pages/Monitor';
-import AboutPage from '@/pages/About';
-import {Text} from 'react-native-paper';
-import Icon from '@/components/Icon';
-import TabButton from '@/components/TabButton';
 import {useSelector} from 'react-redux';
 import {RootState} from '@/store';
-import Header from '@/components/Header';
+import Icon from '@/components/Icon';
+import HomeStack from './stack/HomeStack';
+import TrendingStack from './stack/TrendingStack';
+import MonitorStack from './stack/MonitorStack';
+import screenOptions from './ScreenOptions';
+import TabBar from '@/components/TabBar';
 
 const Tab = createBottomTabNavigator();
 
 export default function TabNavigator() {
-  const tasks = useSelector((state: RootState) => state.results)?.length;
+  const tasks = useSelector((state: RootState) => state.monitor)?.length;
   return (
     <Tab.Navigator
-      backBehavior="history"
-      initialRouteName={tasks > 0 ? 'monitor' : 'search'}
-      screenOptions={{
-        headerShown: true,
-        tabBarHideOnKeyboard: true,
-        tabBarLabel: ({focused, color, children}) => {
-          return (
-            !focused && <Text style={{color, fontSize: 10}}>{children}</Text>
-          );
-        },
-        tabBarButton: props => {
-          return <TabButton {...props} />;
-        },
-        tabBarBadgeStyle: {
-          position: 'absolute',
-          top: 6,
-          left: 12,
-        },
-        header: props => <Header {...props} />,
-      }}>
+      tabBar={props => <TabBar {...props} />}
+      screenOptions={screenOptions}>
       <Tab.Screen
-        name="search"
-        component={StackNavigator}
+        name="Home"
+        component={HomeStack}
         options={{
-          title: 'Busca',
-          headerShown: false,
           tabBarIcon: props => (
             <Icon from="materialIcons" name="search" {...props} />
           ),
         }}
       />
       <Tab.Screen
-        name="monitor"
-        component={MonitorPage}
+        name="Monitor"
+        component={MonitorStack}
         options={{
-          title: 'Monitor',
           tabBarIcon: props => (
             <Icon from="materialCommunity" name="list-status" {...props} />
           ),
@@ -62,26 +38,11 @@ export default function TabNavigator() {
         }}
       />
       <Tab.Screen
-        name="settings"
-        component={SettingsPage}
+        name="Trending"
+        component={TrendingStack}
         options={{
-          title: 'Definições',
           tabBarIcon: props => (
-            <Icon from="materialCommunity" name="cog" {...props} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="about"
-        component={AboutPage}
-        options={{
-          title: 'Sobre',
-          tabBarIcon: props => (
-            <Icon
-              from="materialCommunity"
-              name="exclamation-thick"
-              {...props}
-            />
+            <Icon from="ionicons" name="trending-up" {...props} />
           ),
         }}
       />
