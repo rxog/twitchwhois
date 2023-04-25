@@ -102,6 +102,10 @@ export default function Schedule({data}: {data: ScheduleData}) {
       );
     }
   }
+  if (!data.segments) {
+    return null;
+  }
+
   return (
     <View>
       <Text style={styles.schedule}>

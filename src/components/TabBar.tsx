@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import React, {useState, useEffect} from 'react';
 import {View, Pressable, Text, Keyboard, StyleSheet} from 'react-native';
 import Animated, {
@@ -5,7 +6,7 @@ import Animated, {
   withSpring,
   useAnimatedStyle,
 } from 'react-native-reanimated';
-import {colorAlpha, colors} from '@/assets/styles';
+import {colorAlpha, colorObject, colors} from '@/assets/styles';
 import {NavigationState} from '@react-navigation/native';
 
 type TabBarProps = {
@@ -19,7 +20,6 @@ export default function TabBar({state, descriptors, navigation}: TabBarProps) {
   const currentOptions = currentRoute.options;
   const tabBarBackground = currentOptions.tabBarBackground;
   const tabBarHideOnKeyboard = !!currentOptions?.tabBarHideOnKeyboard;
-  const [refresh, setRefresh] = useState(false);
   const [tabHeight, setTabHeight] = useState(0);
   const translateY = useSharedValue(0);
 
@@ -32,12 +32,6 @@ export default function TabBar({state, descriptors, navigation}: TabBarProps) {
       ],
     };
   });
-
-  useEffect(() => {
-    if (refresh) {
-      console.log('Refreshing...');
-    }
-  }, [state, refresh]);
 
   useEffect(() => {
     const showSubscription = Keyboard.addListener('keyboardDidShow', () => {
@@ -59,6 +53,7 @@ export default function TabBar({state, descriptors, navigation}: TabBarProps) {
 
   const styles = StyleSheet.create({
     main: {
+      marginTop: 20,
       zIndex: 9999,
       bottom: 20,
       right: 0,
@@ -78,85 +73,119 @@ export default function TabBar({state, descriptors, navigation}: TabBarProps) {
       gap: 10,
     },
     tabButtonView: {
-      borderRadius: 50,
+      borderRadius: 100,
       overflow: 'hidden',
       alignItems: 'center',
       justifyContent: 'center',
-    },
-    tabButtonPressable: {
-      padding: 12,
-      alignItems: 'center',
-      justifyContent: 'center',
+      padding: 14,
     },
   });
 
   return (
-    <Animated.View
-      onLayout={({nativeEvent}) => setTabHeight(nativeEvent.layout.height * 2)}
-      style={[styles.main, translateStyle]}>
-      {tabBarBackground && tabBarBackground}
-      <View style={styles.tabBar}>
-        {state.routes.map((route, index: number) => {
-          const {options} = descriptors[route.key];
+    <View>
+      <Animated.View
+        onLayout={({nativeEvent}) =>
+          setTabHeight(nativeEvent.layout.height * 2)
+        }
+        style={[styles.main, translateStyle]}>
+        {tabBarBackground && tabBarBackground}
+        <View style={styles.tabBar}>
+          {state.routes.map((route, index: number) => {
+            const {options} = descriptors[route.key];
 
-          const focused = state.index === index;
-          const color = focused
-            ? options?.tabBarActiveTintColor
-            : options?.tabBarInactiveTintColor;
-          const backgroundColor = focused
-            ? options?.tabBarActiveBackgroundColor
-            : options?.tabBarInactiveBackgroundColor;
+            const focused = state.index === index;
+            const color = focused
+              ? options?.tabBarActiveTintColor
+              : options?.tabBarInactiveTintColor;
+            const backgroundColor = focused
+              ? options?.tabBarActiveBackgroundColor
+              : options?.tabBarInactiveBackgroundColor;
 
-          const icon =
-            options.tabBarIcon &&
-            options.tabBarIcon({
-              focused,
-              color,
-              size: 28,
-            });
+            const button = options.tabBarButton;
 
-          const label =
-            options.tabBarLabel !== undefined
-              ? options.tabBarLabel
-              : options.title !== undefined
-              ? options.title
-              : route.name;
+            const icon =
+              options.tabBarIcon &&
+              options.tabBarIcon({
+                focused,
+                color,
+                size: 28,
+              });
 
-          const onPress = () => {
-            setRefresh(true);
-            const event = navigation.emit({
-              type: 'tabPress',
-              target: route.key,
-            });
+            const label =
+              options.tabBarLabel !== undefined
+                ? options.tabBarLabel
+                : options.title !== undefined
+                ? options.title
+                : route.name;
 
-            if (!focused && !event.defaultPrevented) {
-              navigation.navigate(route.name);
+            const badge = options.tabBarBadge;
+
+            const onPress = () => {
+              const event = navigation.emit({
+                type: 'tabPress',
+                target: route.key,
+              });
+
+              if (!focused && !event.defaultPrevented) {
+                navigation.navigate(route.name);
+              }
+            };
+
+            const onLongPress = () => {
+              navigation.emit({
+                type: 'tabLongPress',
+                target: route.key,
+              });
+            };
+
+            if (button) {
+              return button?.();
             }
-          };
 
-          const onLongPress = () => {
-            navigation.emit({
-              type: 'tabLongPress',
-              target: route.key,
-            });
-          };
-
-          return (
-            <View key={route.key} style={styles.tabButtonView}>
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel={options.tabBarAccessibilityLabel}
-                testID={options.tabBarTestID}
-                onPress={onPress}
-                onLongPress={onLongPress}
-                style={[styles.tabButtonPressable, {backgroundColor}]}
-                android_ripple={{radius: 30}}>
-                {icon ? icon : <Text style={{color}}>{label}</Text>}
-              </Pressable>
-            </View>
-          );
-        })}
-      </View>
-    </Animated.View>
+            return (
+              <View key={route.key}>
+                <View style={[styles.tabButtonView, {backgroundColor}]}>
+                  {icon ? icon : <Text style={{color}}>{label}</Text>}
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel={options.tabBarAccessibilityLabel}
+                    testID={options.tabBarTestID}
+                    onPress={onPress}
+                    onLongPress={onLongPress}
+                    style={StyleSheet.absoluteFill}
+                    android_ripple={{
+                      color: colorAlpha(
+                        colorObject(backgroundColor).isDark()
+                          ? colors.light
+                          : colors.dark,
+                        0.1,
+                      ),
+                    }}
+                  />
+                </View>
+                {badge && (
+                  <View
+                    style={{
+                      backgroundColor: colors.errorContainer,
+                      position: 'absolute',
+                      bottom: 0,
+                      right: 0,
+                      borderRadius: 50,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      height: 20,
+                      width: 20,
+                    }}>
+                    <Text style={{color: colors.onErrorContainer}}>
+                      {badge}
+                    </Text>
+                  </View>
+                )}
+              </View>
+            );
+          })}
+        </View>
+      </Animated.View>
+    </View>
   );
 }

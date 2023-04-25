@@ -13,8 +13,6 @@ import {
   Image,
   Linking,
   FlatList,
-  ToastAndroid,
-  ActivityIndicator,
   ColorValue,
 } from 'react-native';
 import Animated from 'react-native-reanimated';
@@ -29,10 +27,12 @@ import {orderBy} from 'lodash';
 import Schedule from '@/components/Schedule';
 import {colorAlpha, colors} from '@/assets/styles';
 import Icon from '@/components/Icon';
-import {NavigationProp, RouteProp} from '@react-navigation/native';
+import {RouteProp, useFocusEffect} from '@react-navigation/native';
 import {RouteParams} from 'src/types/RouteParams';
 import {AndroidImageColors} from 'react-native-image-colors/lib/typescript/types';
 import StatusBar from '@/components/StatusBar';
+import Loading from '@/components/Loading';
+import Avatar from '@/components/Avatar';
 
 const DataField = ({
   title,
@@ -64,9 +64,10 @@ const DataField = ({
 };
 
 export default function Profile({
+  navigation,
   route,
 }: {
-  navigation: NavigationProp<any>;
+  navigation: any;
   route: RouteProp<any>;
 }) {
   const [_isSticky, setIsSticky] = React.useState(false);
@@ -110,19 +111,21 @@ export default function Profile({
     }
   }, [coverProps, profile?.color]);
 
+  useFocusEffect(
+    React.useCallback(() => {
+      return () => {
+        setCoverProps(undefined);
+        setCoverHeight(0);
+        setProfileColor(undefined);
+        if (navigation.canGoBack()) {
+          navigation.pop();
+        }
+      };
+    }, [navigation]),
+  );
+
   if (!profileColor) {
-    return (
-      <ActivityIndicator
-        size="large"
-        color={colors.primary}
-        style={{
-          flex: 1,
-          justifyContent: 'center',
-          alignItems: 'center',
-          backgroundColor: colors.background,
-        }}
-      />
-    );
+    return <Loading />;
   }
 
   return (
@@ -131,7 +134,6 @@ export default function Profile({
       contentContainerStyle={{
         paddingBottom: 100,
         backgroundColor: colors.background,
-        flexGrow: 1,
       }}
       stickyHeaderIndices={[1]}
       onScroll={event => {
@@ -153,16 +155,12 @@ export default function Profile({
               justifyContent: 'center',
               padding: 20,
             }}>
-            <Image
-              source={{uri: profile.profile_image_url}}
-              style={{
-                height: 150,
-                width: 150,
-                borderRadius: 100,
-                borderColor: profileColor,
-                borderWidth: 6,
-                overflow: 'hidden',
-              }}
+            <Avatar
+              source={profile.profile_image_url}
+              size={150}
+              borderColor={profileColor}
+              borderWidth={6}
+              isLive={!!profile.stream}
             />
             <Text
               style={{
@@ -287,7 +285,6 @@ export default function Profile({
                 radius={25}
                 onPress={() => {
                   Clipboard.setString(profile.color);
-                  ToastAndroid.show('Copiado', ToastAndroid.SHORT);
                 }}>
                 {profile.color}
               </Button>
@@ -442,7 +439,9 @@ export default function Profile({
                   ? 'Ao vivo'
                   : profile.stream?.type === 'rerun' && 'Retransmitindo'
               }
-              description={`${profile.stream?.viewer_count} espectadores`}
+              description={`${Number(
+                profile.stream?.viewer_count,
+              ).toLocaleString('pt-BR')} espectadores`}
             />
             <DataField
               title="Publico"
@@ -478,11 +477,15 @@ export default function Profile({
                           <Text
                             style={{
                               fontWeight: 'bold',
+                              color: colors.dark,
                             }}>
                             {emote.name}
                           </Text>
                           <Divider />
-                          <Text>
+                          <Text
+                            style={{
+                              color: colors.dark,
+                            }}>
                             {emote.emote_type === 'subscriptions'
                               ? `Inscrito (Tier ${Number(emote.tier) / 1000})`
                               : emote.emote_type === 'bitstier'
@@ -520,7 +523,14 @@ export default function Profile({
                 orderBy(badges.versions, o => +o.id).map(badge => {
                   return (
                     <Popover
-                      content={<Text>{badge.title}</Text>}
+                      content={
+                        <Text
+                          style={{
+                            color: colors.dark,
+                          }}>
+                          {badge.title}
+                        </Text>
+                      }
                       key={badge.id}>
                       <Image
                         source={{uri: badge.image_url_2x}}

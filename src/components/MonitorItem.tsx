@@ -21,13 +21,18 @@ export default function MonitorItem({item}: {item: Item}) {
       backgroundColor: colors.backgroundVariant,
       padding: 20,
       borderRadius: 20,
+      overflow: 'hidden',
     },
     text: {color: colors.text},
     muted: {color: colors.muted},
-    iconName: {flexDirection: 'row', alignItems: 'center'},
+    icon: {
+      ...StyleSheet.absoluteFillObject,
+      alignItems: 'flex-end',
+      right: -60,
+      top: -60,
+    },
     username: {
       fontWeight: 'bold',
-      marginTop: -5,
       fontSize: 30,
       color,
     },
@@ -42,10 +47,15 @@ export default function MonitorItem({item}: {item: Item}) {
   return (
     <View style={styles.main}>
       <View>
-        <View style={styles.iconName}>
-          <Icon from="materialIcons" color={color} name={icon} size={40} />
-          <Text style={styles.username}>{item.userName}</Text>
+        <View style={styles.icon}>
+          <Icon
+            from="materialIcons"
+            color={colors.background}
+            name={icon}
+            size={140}
+          />
         </View>
+        <Text style={styles.username}>{item.userName}</Text>
         <Divider />
         <Text style={styles.text}>
           Atualizado{' '}
@@ -64,14 +74,14 @@ export default function MonitorItem({item}: {item: Item}) {
               'Essa ação não pode ser desfeita.',
               [
                 {
+                  text: 'Cancelar',
+                  style: 'cancel',
+                },
+                {
                   text: 'Apagar',
                   onPress: () => {
                     dispatch(MonitorActions.remove(item.userName));
                   },
-                },
-                {
-                  text: 'Cancelar',
-                  style: 'cancel',
                 },
               ],
             );

@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import {
   Text,
@@ -9,6 +10,7 @@ import {
   ActivityIndicator,
   Vibration,
   Linking,
+  Pressable,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import slugify from '@sindresorhus/slugify';
@@ -85,10 +87,11 @@ export default function Home({navigation}: {navigation: NavigationProp<any>}) {
                         userName: username,
                         isAvailable: false,
                         lastCheckedAt: new Date().toISOString(),
+                        isMonitoring: true,
                       }),
                     );
                     ToastAndroid.show(
-                      `@${username} foi adicionado a lista de monitoramento.`,
+                      `@${username} foi adicionado ao monitoramento`,
                       ToastAndroid.LONG,
                     );
                   },
@@ -143,7 +146,7 @@ export default function Home({navigation}: {navigation: NavigationProp<any>}) {
         <Icon
           from="materialIcons"
           name="search"
-          size={30}
+          size={40}
           color={colors.secondary}
           style={styles.searchIcon}
         />
@@ -180,6 +183,11 @@ export default function Home({navigation}: {navigation: NavigationProp<any>}) {
           />
         )}
       </View>
+      <Pressable onPress={() => Linking.openURL('https://xogumon.com/')}>
+        <Text style={{textAlign: 'center'}}>
+          Desenvolvido por <Text style={{fontWeight: 'bold'}}>Xogumon</Text>
+        </Text>
+      </Pressable>
     </ScrollView>
   );
 }
@@ -192,10 +200,9 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     flexGrow: 1,
-    paddingVertical: 20,
-    lineHeight: 24,
     fontSize: 24,
-    color: colors.primary,
+    marginHorizontal: -10,
+    color: colors.secondary,
   },
   searchIcon: {
     paddingHorizontal: 10,
@@ -203,6 +210,7 @@ const styles = StyleSheet.create({
   searchContent: {
     flexDirection: 'row',
     backgroundColor: colors.background,
+    padding: 10,
     marginVertical: 10,
     borderRadius: 50,
     alignItems: 'center',

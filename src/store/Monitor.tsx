@@ -23,13 +23,13 @@ const Monitor = createSlice({
           ...state[idx],
           ...action.payload,
         };
-        return state;
       } else {
         state.push(action.payload);
       }
+      return state;
     },
     remove: (state, action: PayloadAction<string>) => {
-      state = state.filter(item => item.userName !== action.payload);
+      return state.filter(item => item.userName !== action.payload);
     },
     reset: () => initialState,
   },

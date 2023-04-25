@@ -8,6 +8,7 @@ const screenOptions = {
   tabBarInactiveBackgroundColor: colors.background,
   tabBarHideOnKeyboard: true,
   tabBarShowLabel: false,
+  freezeOnBlur: true,
 };
 
 export default screenOptions;
