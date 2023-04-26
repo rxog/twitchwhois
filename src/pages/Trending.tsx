@@ -23,13 +23,17 @@ export default function TrendingPage({
 }: {
   navigation: NavigationProp<any>;
 }): JSX.Element {
-  const [games, setGames] = React.useState<TwitchTopGameStreams[] | null>(null);
+  const [games, setGames] = React.useState<TwitchTopGameStreams[]>();
   const [isLoading, setIsLoading] = React.useState(true);
   const [refreshing, setRefreshing] = React.useState(false);
 
   const getData = React.useCallback(() => {
     Twitch.topGameStreams()
-      .then(setGames)
+      .then(data => {
+        if (data) {
+          setGames(data);
+        }
+      })
       .finally(() => {
         setIsLoading(false);
         setRefreshing(false);
@@ -76,7 +80,7 @@ export default function TrendingPage({
           }}
         />
       }
-      data={games}
+      data={games || []}
       contentContainerStyle={styles.container}
       ListHeaderComponent={
         <Headline style={styles.headline}>Trending</Headline>
@@ -109,8 +113,8 @@ export default function TrendingPage({
               }}
             />
             <View style={{flex: 1, padding: 10}}>
-              <Headline>{item.name}</Headline>
-              <Divider />
+              <Headline style={{textAlign: 'center'}}>{item.name}</Headline>
+              <Divider color={colors.tertiary} />
               {item.streams?.map(stream => (
                 <View key={stream.id} style={{marginVertical: 5}}>
                   <Button
@@ -153,7 +157,6 @@ export default function TrendingPage({
               ))}
             </View>
           </ImageBackground>
-          <Divider />
         </View>
       )}
     />

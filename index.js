@@ -8,7 +8,7 @@ import {MonitorActions} from '@/store/Monitor';
 import App from './src/App';
 import TwitchAPI from '@/utils/Twitch';
 import sleep from '@/utils/sleep';
-import displayNotification from '@/modules/DisplayNotification';
+import displayNotification from '@/utils/DisplayNotification';
 
 const fetchMonitorList = async () => {
   try {
@@ -36,11 +36,12 @@ const fetchMonitorList = async () => {
             }),
           );
         }
-      });
 
-      await sleep(5000);
-      return true;
+        await sleep(5000);
+      });
     }
+
+    return true;
   } catch (err) {
     console.log(err);
     return false;

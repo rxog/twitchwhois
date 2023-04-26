@@ -119,8 +119,8 @@ export default function Home({navigation}: {navigation: NavigationProp<any>}) {
             );
           default:
             return Alert.alert(
-              'Erro não esperado!',
-              'Tente novamente mais tarde.',
+              'Usuário inválido!',
+              'O nome que você procura não é um nome válido atualmente na Twitch.',
             );
         }
       }
@@ -183,11 +183,20 @@ export default function Home({navigation}: {navigation: NavigationProp<any>}) {
           />
         )}
       </View>
-      <Pressable onPress={() => Linking.openURL('https://xogumon.com/')}>
-        <Text style={{textAlign: 'center'}}>
-          Desenvolvido por <Text style={{fontWeight: 'bold'}}>Xogumon</Text>
-        </Text>
-      </Pressable>
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'center',
+          alignItems: 'center',
+          gap: 5,
+        }}>
+        <Text style={{color: colors.background}}>Desenvolvido por</Text>
+        <Pressable onPress={() => Linking.openURL('https://xogumon.com/')}>
+          <Text style={{color: colors.background, fontWeight: 'bold'}}>
+            Xogumon
+          </Text>
+        </Pressable>
+      </View>
     </ScrollView>
   );
 }

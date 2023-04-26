@@ -27,8 +27,8 @@ import {orderBy} from 'lodash';
 import Schedule from '@/components/Schedule';
 import {colorAlpha, colors} from '@/assets/styles';
 import Icon from '@/components/Icon';
-import {RouteProp, useFocusEffect} from '@react-navigation/native';
-import {RouteParams} from 'src/types/RouteParams';
+import {useFocusEffect} from '@react-navigation/native';
+import {ProfileScreenProps} from 'src/types/Navigation';
 import {AndroidImageColors} from 'react-native-image-colors/lib/typescript/types';
 import StatusBar from '@/components/StatusBar';
 import Loading from '@/components/Loading';
@@ -63,19 +63,13 @@ const DataField = ({
   );
 };
 
-export default function Profile({
-  navigation,
-  route,
-}: {
-  navigation: any;
-  route: RouteProp<any>;
-}) {
+export default function Profile({navigation, route}: ProfileScreenProps) {
   const [_isSticky, setIsSticky] = React.useState(false);
   const [coverProps, setCoverProps] = React.useState<AndroidImageColors>();
   const [coverHeight, setCoverHeight] = React.useState(0);
   const [profileColor, setProfileColor] = React.useState<ColorValue>();
 
-  const profile = (route.params as RouteParams).profile;
+  const profile = route.params.profile;
   const createdAt = Date.parse(profile.created_at);
   const coverImage = (
     profile.stream?.thumbnail_url ||
@@ -406,7 +400,8 @@ export default function Profile({
         <DataField
           title="Tags"
           description={
-            profile.channel.tags && (
+            profile.channel.tags &&
+            !!profile.channel.tags.length && (
               <View style={{marginTop: 5, marginHorizontal: -20}}>
                 <FlatList
                   data={profile.channel.tags}
@@ -449,7 +444,7 @@ export default function Profile({
             />
           </View>
         )}
-        {profile.emotes && (
+        {profile.emotes && !!profile.emotes.length && (
           <View>
             <Headline>Emotes</Headline>
             <Divider />
@@ -506,7 +501,7 @@ export default function Profile({
             <Divider />
           </View>
         )}
-        {profile.badges && (
+        {profile.badges && !!profile.badges.length && (
           <View>
             <Headline>Badges</Headline>
             <Divider />

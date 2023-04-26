@@ -42,10 +42,6 @@
                 <data android:scheme="twitchwhois" android:host="monitor" />
             </intent-filter>
         </activity>
-
-        <!-- Definição do serviço do react-native-background-actions -->
-        <service android:name="com.asterinet.react.bgactions.RNBackgroundActionsTask" />
-
     </application>
 
 </manifest>

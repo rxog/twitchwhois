@@ -7,18 +7,23 @@ import {
   NavigationContainerRefWithCurrent,
 } from '@react-navigation/native';
 import {colors} from './assets/styles';
+import {useKeepAwake} from '@sayem314/react-native-keep-awake';
 
 function App(): JSX.Element {
+  useKeepAwake();
+
   React.useEffect(() => {
     notifee.onBackgroundEvent(async ({type, detail}) => {
       const {notification, pressAction} = detail;
       if (type === EventType.PRESS) {
         const screen = pressAction?.id;
 
-        if (screen && navigationRef.isReady()) {
+        if (screen === 'monitor' && navigationRef.isReady()) {
           (navigationRef as NavigationContainerRefWithCurrent<any>).navigate(
-            screen,
+            'List',
           );
+        } else {
+          console.log(screen);
         }
 
         if (notification?.id && typeof notification.id === 'string') {
@@ -35,7 +40,7 @@ function App(): JSX.Element {
         prefixes: ['twitchwhois://'],
         config: {
           screens: {
-            monitor: 'monitor',
+            monitor: 'List',
           },
         },
       }}>

@@ -1,6 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import {ColorValue, Image, View, StyleSheet} from 'react-native';
+import {ColorValue, Pressable, Image, View} from 'react-native';
+import Animated, {
+  withSpring,
+  useAnimatedStyle,
+  useSharedValue,
+} from 'react-native-reanimated';
 import {PulseIndicator} from 'react-native-indicators';
 
 type AvatarProps = {
@@ -16,35 +21,45 @@ export default function Avatar({
   source,
   size,
   borderColor,
-  borderWidth,
+  borderWidth = 0,
 }: AvatarProps) {
-  const styles = StyleSheet.create({
-    view: {
-      borderColor: borderColor,
-      borderWidth: borderWidth,
-      borderRadius: 100,
-      overflow: 'hidden',
-    },
-    image: {
-      backgroundColor: borderColor,
-      height: size,
-      width: size,
-    },
-  });
+  const borderRadius = useSharedValue(100);
+  const AnimBorderWidth = useSharedValue(borderWidth);
+
+  const imageViewStyle = useAnimatedStyle(() => ({
+    borderColor: borderColor,
+    borderWidth: AnimBorderWidth.value,
+    borderRadius: borderRadius.value,
+    overflow: 'hidden',
+  }));
+
   return (
     <View>
-      <View style={styles.view}>
-        <Image
-          source={{
-            uri: source,
+      <Animated.View style={imageViewStyle}>
+        <Pressable
+          onPressIn={() => {
+            borderRadius.value = withSpring(14);
           }}
-          style={styles.image}
-        />
-      </View>
+          onPressOut={() => {
+            borderRadius.value = withSpring(100);
+          }}>
+          <Image
+            source={{
+              uri: source,
+            }}
+            style={{
+              width: size,
+              height: size,
+              resizeMode: 'contain',
+              backgroundColor: borderColor,
+            }}
+          />
+        </Pressable>
+      </Animated.View>
       {isLive && (
         <PulseIndicator
-          color="#FF0000"
-          style={{position: 'absolute', top: 10, right: 0}}
+          color="#f04545"
+          style={{position: 'absolute', top: -10, right: -10}}
         />
       )}
     </View>

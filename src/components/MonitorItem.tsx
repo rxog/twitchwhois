@@ -19,17 +19,18 @@ export default function MonitorItem({item}: {item: Item}) {
       marginHorizontal: 10,
       marginBottom: 10,
       backgroundColor: colors.backgroundVariant,
-      padding: 20,
-      borderRadius: 20,
+      padding: 12,
+      borderRadius: 10,
       overflow: 'hidden',
+      elevation: 3,
     },
-    text: {color: colors.text},
+    text: {color: colors.text, fontSize: 12},
     muted: {color: colors.muted},
     icon: {
       ...StyleSheet.absoluteFillObject,
       alignItems: 'flex-end',
-      right: -60,
-      top: -60,
+      right: -85,
+      top: -35,
     },
     username: {
       fontWeight: 'bold',
@@ -40,7 +41,14 @@ export default function MonitorItem({item}: {item: Item}) {
       flexDirection: 'row',
       justifyContent: 'flex-end',
       alignItems: 'center',
-      gap: 20,
+      gap: 5,
+    },
+    btn: {
+      width: 35,
+      height: 35,
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: 0,
     },
   });
 
@@ -52,7 +60,7 @@ export default function MonitorItem({item}: {item: Item}) {
             from="materialIcons"
             color={colors.background}
             name={icon}
-            size={140}
+            size={145}
           />
         </View>
         <Text style={styles.username}>{item.userName}</Text>
@@ -68,6 +76,9 @@ export default function MonitorItem({item}: {item: Item}) {
       <View style={styles.actions}>
         {!item.isMonitoring && <Text style={styles.muted}>Parado</Text>}
         <Button
+          style={styles.btn}
+          color={colors.onErrorContainer}
+          elevation={1}
           onPress={async () => {
             Alert.alert(
               `Apagar @${item.userName}?`,
@@ -86,9 +97,12 @@ export default function MonitorItem({item}: {item: Item}) {
               ],
             );
           }}>
-          <Icon from="octicons" name="trash" size={20} />
+          <Icon from="octicons" name="trash" size={16} color={colors.onError} />
         </Button>
         <Button
+          style={styles.btn}
+          color={colors.inversePrimary}
+          elevation={1}
           onPress={async () => {
             if (item.isMonitoring) {
               dispatch(MonitorActions.update({...item, isMonitoring: false}));
@@ -96,7 +110,7 @@ export default function MonitorItem({item}: {item: Item}) {
             }
             dispatch(MonitorActions.update({...item, isMonitoring: true}));
           }}>
-          <Icon name="play-pause" size={20} />
+          <Icon name="play-pause" size={16} color={colors.primary} />
         </Button>
       </View>
     </View>
