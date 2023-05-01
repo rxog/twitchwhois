@@ -33,6 +33,7 @@ import {AndroidImageColors} from 'react-native-image-colors/lib/typescript/types
 import StatusBar from '@/components/StatusBar';
 import Loading from '@/components/Loading';
 import Avatar from '@/components/Avatar';
+import Hyperlink from 'react-native-hyperlink';
 
 const DataField = ({
   title,
@@ -51,10 +52,15 @@ const DataField = ({
         {title}
       </Text>
       {typeof description === 'string' ? (
-        <Text
-          style={{color: colors.primary, fontWeight: 'normal', fontSize: 14}}>
-          {description}
-        </Text>
+        <Hyperlink
+          onPress={(url, _text) =>
+            Linking.canOpenURL(url).then(open => open && Linking.openURL(url))
+          }>
+          <Text
+            style={{color: colors.primary, fontWeight: 'normal', fontSize: 14}}>
+            {description}
+          </Text>
+        </Hyperlink>
       ) : (
         description
       )}
@@ -128,6 +134,7 @@ export default function Profile({navigation, route}: ProfileScreenProps) {
       contentContainerStyle={{
         paddingBottom: 100,
         backgroundColor: colors.background,
+        flexGrow: 1,
       }}
       stickyHeaderIndices={[1]}
       onScroll={event => {
@@ -459,11 +466,6 @@ export default function Profile({navigation, route}: ProfileScreenProps) {
               }}>
               {orderBy(profile.emotes, ['emote_type', 'name'], 'desc').map(
                 emote => {
-                  const image = `https://static-cdn.jtvnw.net/emoticons/v2/${
-                    emote.id
-                  }/${
-                    emote.format.includes('animated') ? 'animated' : 'static'
-                  }/dark/2.0`;
                   return (
                     <Popover
                       key={emote.id}
@@ -490,7 +492,7 @@ export default function Profile({navigation, route}: ProfileScreenProps) {
                         </View>
                       }>
                       <Image
-                        source={{uri: image}}
+                        source={{uri: emote.images.url_2x}}
                         style={{height: 44, width: 44}}
                       />
                     </Popover>

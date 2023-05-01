@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Component} from 'react';
 import {AppRegistry} from 'react-native';
 import BackgroundFetch from 'react-native-background-fetch';
 import {name as appName} from './app.json';
@@ -13,33 +13,31 @@ import displayNotification from '@/utils/DisplayNotification';
 const fetchMonitorList = async () => {
   try {
     const dispatch = Store.dispatch;
-    const items = Store.getState().monitor;
+    const items = Store.getState().monitor.filter(o => o.isMonitoring);
 
-    for (const item of items.filter(o => o.isMonitoring)) {
-      const now = new Date().toISOString();
+    await Promise.all(
+      items.map(item =>
+        TwitchAPI.isAvailable(item.userName).then(async status => {
+          const updated = {...item, lastCheckedAt: new Date().toISOString()};
 
-      await TwitchAPI.isAvailable(item.userName).then(async status => {
-        if (status === 1) {
-          dispatch(
-            MonitorActions.update({
-              ...item,
-              lastCheckedAt: now,
-              isAvailable: true,
-            }),
-          );
-          displayNotification(item.userName);
-        } else {
-          dispatch(
-            MonitorActions.update({
-              ...item,
-              lastCheckedAt: now,
-            }),
-          );
-        }
+          if (status === 1) {
+            dispatch(
+              MonitorActions.update({
+                ...updated,
+                isAvailable: true,
+              }),
+            );
+            displayNotification(item.userName);
+          } else {
+            dispatch(MonitorActions.update(updated));
+          }
 
-        await sleep(5000);
-      });
-    }
+          await sleep(1000);
+
+          return status;
+        }),
+      ),
+    );
 
     return true;
   } catch (err) {
@@ -48,7 +46,7 @@ const fetchMonitorList = async () => {
   }
 };
 
-export default class Main extends React.PureComponent {
+export default class Main extends Component {
   componentDidMount() {
     this.initBackgroundFetch();
   }
@@ -62,7 +60,9 @@ export default class Main extends React.PureComponent {
         requiredNetworkType: BackgroundFetch.NETWORK_TYPE_ANY,
       },
       async taskId => {
-        await fetchMonitorList().then(console.log);
+        await fetchMonitorList().then(updated =>
+          console.log(updated, new Date()),
+        );
         BackgroundFetch.finish(taskId);
       },
       taskId => {
@@ -96,6 +96,6 @@ BackgroundFetch.registerHeadlessTask(async ({timeout, taskId}) => {
     BackgroundFetch.finish(taskId);
     return;
   }
-  await fetchMonitorList().then(console.log);
+  await fetchMonitorList().then(updated => console.log(updated, new Date()));
   BackgroundFetch.finish(taskId);
 });

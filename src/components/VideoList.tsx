@@ -9,8 +9,6 @@ import {
   Pressable,
   StyleSheet,
   Image,
-  ViewStyle,
-  TextStyle,
 } from 'react-native';
 import {uniqBy, capitalize} from 'lodash';
 import axios from 'axios';
@@ -60,10 +58,10 @@ export default function VideoList({
     }
   }, [cursor, type, userId]);
 
-  const styles = {
+  const styles = StyleSheet.create({
     main: {
       borderRadius: 12,
-      overflow: 'hidden' as ViewStyle['overflow'],
+      overflow: 'hidden',
       backgroundColor: colors.backgroundVariant,
       height: 240,
       width: width * 0.8 - 20,
@@ -76,7 +74,7 @@ export default function VideoList({
     content: {padding: 12},
     title: {
       color: colors.text,
-      fontWeight: 'bold' as TextStyle['fontWeight'],
+      fontWeight: 'bold',
       fontSize: sizes.bodySmall,
     },
     description: {color: colors.muted},
@@ -85,7 +83,7 @@ export default function VideoList({
       gap: 20,
       paddingHorizontal: 20,
     },
-  };
+  });
 
   return (
     <FlatList
